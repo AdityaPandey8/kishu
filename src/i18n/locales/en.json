@@ -1,0 +1,112 @@
+{
+  "common": {
+    "appName": "KISHU",
+    "tagline": "Your AI Crop Doctor",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "offline": "You're offline",
+    "online": "Back online"
+  },
+  "nav": {
+    "home": "Home",
+    "scan": "Scan Crop",
+    "history": "History",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Full Name",
+    "phone": "Phone Number",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginSuccess": "Welcome back!",
+    "signupSuccess": "Account created successfully!",
+    "selectRole": "I am a",
+    "farmer": "Farmer",
+    "dealer": "Dealer"
+  },
+  "home": {
+    "welcome": "Welcome",
+    "quickScan": "Quick Scan",
+    "scanDescription": "Take a photo of your crop to detect diseases",
+    "recentDiagnoses": "Recent Diagnoses",
+    "viewAll": "View All",
+    "tips": "Today's Tips",
+    "weather": "Weather",
+    "noDiagnoses": "No diagnoses yet. Scan your first crop!"
+  },
+  "scan": {
+    "title": "Scan Your Crop",
+    "takePhoto": "Take Photo",
+    "uploadPhoto": "Upload from Gallery",
+    "analyzing": "Analyzing your crop...",
+    "instructions": "Position the affected leaf or plant part clearly in the frame",
+    "retake": "Retake",
+    "analyze": "Analyze"
+  },
+  "diagnosis": {
+    "result": "Diagnosis Result",
+    "disease": "Disease Detected",
+    "healthy": "Your crop looks healthy!",
+    "confidence": "Confidence",
+    "severity": "Severity",
+    "crop": "Crop Type",
+    "treatment": "Treatment",
+    "organic": "Organic Remedies",
+    "chemical": "Chemical Treatment",
+    "prevention": "Prevention Tips",
+    "dosage": "Dosage",
+    "application": "How to Apply",
+    "saveToHistory": "Save to History",
+    "findDealer": "Find Nearby Dealer",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "severe": "Severe"
+  },
+  "history": {
+    "title": "Diagnosis History",
+    "empty": "No past diagnoses",
+    "filterByCrop": "Filter by Crop",
+    "filterByDate": "Filter by Date"
+  },
+  "profile": {
+    "title": "My Profile",
+    "farmDetails": "Farm Details",
+    "location": "Location",
+    "crops": "Crops I Grow",
+    "language": "Language",
+    "notifications": "Notifications",
+    "editProfile": "Edit Profile"
+  },
+  "weather": {
+    "today": "Today",
+    "humidity": "Humidity",
+    "wind": "Wind",
+    "rainfall": "Rainfall"
+  },
+  "tips": {
+    "tip1": "Water your crops early morning for best absorption",
+    "tip2": "Rotate crops yearly to maintain soil health",
+    "tip3": "Check leaves regularly for early disease signs"
+  }
+}
