@@ -9,6 +9,7 @@ import { MarketPrices } from '@/components/home/MarketPrices';
 import { SeasonalCalendar } from '@/components/home/SeasonalCalendar';
 import { ExpertHelp } from '@/components/home/ExpertHelp';
 import { CropGuide } from '@/components/home/CropGuide';
+import { WeatherAlertsWidget } from '@/components/home/WeatherAlertsWidget';
 import { useAuth } from '@/contexts/AuthContext';
 
 const FarmerDashboard = () => {
@@ -30,6 +31,9 @@ const FarmerDashboard = () => {
 
         {/* Quick Scan Card */}
         <QuickScanCard />
+
+        {/* Weather Alert */}
+        <WeatherAlertsWidget />
 
         {/* Weather + Market Prices Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
