@@ -1,44 +1,34 @@
-import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { QuickScanCard } from '@/components/home/QuickScanCard';
-import { TipsCarousel } from '@/components/home/TipsCarousel';
-import { WeatherWidget } from '@/components/home/WeatherWidget';
-import { RecentDiagnoses } from '@/components/home/RecentDiagnoses';
+import { useAuth } from '@/contexts/AuthContext';
+import { Navigate } from 'react-router-dom';
+import FarmerDashboard from './dashboard/FarmerDashboard';
+import DealerDashboard from './dashboard/DealerDashboard';
+import AdminDashboard from './dashboard/AdminDashboard';
 
 const Index = () => {
-  const { t } = useTranslation();
+  const { user, isLoading } = useAuth();
 
-  // Mock user name - will be replaced with actual auth
-  const userName = 'Farmer';
-
-  return (
-    <AppLayout>
-      <div className="container px-4 py-6 space-y-5">
-        {/* Welcome Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <p className="text-sm text-muted-foreground">{t('home.welcome')},</p>
-          <h1 className="text-2xl font-bold text-foreground">{userName} 👋</h1>
-        </motion.div>
-
-        {/* Quick Scan Card */}
-        <QuickScanCard />
-
-        {/* Weather Widget */}
-        <WeatherWidget />
-
-        {/* Tips Carousel */}
-        <TipsCarousel />
-
-        {/* Recent Diagnoses */}
-        <RecentDiagnoses />
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse text-primary">Loading...</div>
       </div>
-    </AppLayout>
-  );
+    );
+  }
+
+  // If not logged in, show farmer dashboard as guest
+  if (!user) {
+    return <FarmerDashboard />;
+  }
+
+  // Role-based dashboard routing
+  switch (user.role) {
+    case 'dealer':
+      return <DealerDashboard />;
+    case 'admin':
+      return <AdminDashboard />;
+    default:
+      return <FarmerDashboard />;
+  }
 };
 
 export default Index;
