@@ -2,11 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Store, Package, Plus, ChevronRight, TrendingUp,
-  MessageSquare, IndianRupee, Users, FileText, BarChart3,
-  Bell, Settings
-} from 'lucide-react';
+import { Package, Plus, ChevronRight, TrendingUp, MessageSquare, IndianRupee, Users, FileText, BarChart3, Bell, Settings } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,14 +16,22 @@ import { ActivityTimeline, ActivityItem } from '@/components/dealer/ActivityTime
 import { InquiryDetailModal } from '@/components/dealer/InquiryDetailModal';
 import { Inquiry } from '@/contexts/DataContext';
 import { toast } from 'sonner';
-
 const DealerDashboard = () => {
-  const { t, i18n } = useTranslation();
+  const {
+    t,
+    i18n
+  } = useTranslation();
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { products, inquiries, updateInquiryStatus, notifications } = useData();
+  const {
+    user
+  } = useAuth();
+  const {
+    products,
+    inquiries,
+    updateInquiryStatus,
+    notifications
+  } = useData();
   const isHindi = i18n.language === 'hi';
-
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
 
   // Filter data for current dealer
@@ -39,7 +43,7 @@ const DealerDashboard = () => {
   const totalProducts = dealerProducts.length;
   const pendingInquiries = dealerInquiries.filter(i => i.status === 'pending').length;
   const urgentCount = dealerInquiries.filter(i => i.urgent && i.status === 'pending').length;
-  const totalRevenue = dealerProducts.reduce((acc, p) => acc + (p.price * p.sales), 0);
+  const totalRevenue = dealerProducts.reduce((acc, p) => acc + p.price * p.sales, 0);
   const totalFarmers = new Set(dealerInquiries.map(i => i.farmerId)).size;
   const totalStock = dealerProducts.reduce((acc, p) => acc + p.stock, 0);
 
@@ -47,224 +51,220 @@ const DealerDashboard = () => {
   const topProducts = [...dealerProducts].sort((a, b) => b.sales - a.sales).slice(0, 5);
 
   // Low stock items
-  const lowStockItems = dealerProducts
-    .filter(p => p.stock < 50)
-    .map(p => ({
-      id: p.id,
-      name: p.name,
-      stock: p.stock,
-      threshold: 50,
-      category: p.category,
-    }));
+  const lowStockItems = dealerProducts.filter(p => p.stock < 50).map(p => ({
+    id: p.id,
+    name: p.name,
+    stock: p.stock,
+    threshold: 50,
+    category: p.category
+  }));
 
   // Recent activities
-  const recentActivities: ActivityItem[] = [
-    { id: '1', type: 'inquiry', title: 'New inquiry received', description: 'Ramesh Kumar asked about fungicides', timestamp: new Date().toISOString() },
-    { id: '2', type: 'response', title: 'Response sent', description: 'Replied to Sunil Yadav', timestamp: new Date(Date.now() - 3600000).toISOString() },
-    { id: '3', type: 'product', title: 'Product updated', description: 'Updated stock for Mancozeb 75%', timestamp: new Date(Date.now() - 7200000).toISOString() },
-    { id: '4', type: 'sale', title: 'New sale', description: 'Sold 5 units of Neem Oil', timestamp: new Date(Date.now() - 10800000).toISOString() },
-  ];
-
-  const stats = [
-    { 
-      label: isHindi ? 'कुल उत्पाद' : 'Total Products', 
-      value: totalProducts, 
-      change: `${totalStock} stock`, 
-      icon: Package, 
-      color: 'text-blue-600', 
-      bgColor: 'bg-blue-100' 
-    },
-    { 
-      label: isHindi ? 'लंबित पूछताछ' : 'Pending Inquiries', 
-      value: pendingInquiries, 
-      change: urgentCount > 0 ? `${urgentCount} urgent` : undefined, 
-      icon: MessageSquare, 
-      color: 'text-amber-600', 
-      bgColor: 'bg-amber-100' 
-    },
-    { 
-      label: isHindi ? 'मासिक राजस्व' : 'Monthly Revenue', 
-      value: `₹${(totalRevenue / 1000).toFixed(1)}K`, 
-      change: '+18%', 
-      icon: IndianRupee, 
-      color: 'text-green-600', 
-      bgColor: 'bg-green-100' 
-    },
-    { 
-      label: isHindi ? 'किसान संपर्क' : 'Farmers Reached', 
-      value: totalFarmers, 
-      change: '+12', 
-      icon: Users, 
-      color: 'text-purple-600', 
-      bgColor: 'bg-purple-100' 
-    },
-  ];
-
-  const quickActions = [
-    { id: 'add-product', label: isHindi ? 'उत्पाद जोड़ें' : 'Add Product', icon: Plus, variant: 'primary' as const, onClick: () => navigate('/products') },
-    { id: 'inquiries', label: isHindi ? 'पूछताछ' : 'Inquiries', icon: MessageSquare, variant: 'secondary' as const, onClick: () => navigate('/inquiries') },
-    { id: 'new-quote', label: isHindi ? 'कोटेशन' : 'New Quote', icon: FileText, variant: 'outline' as const, onClick: () => navigate('/quotes/new') },
-    { id: 'analytics', label: isHindi ? 'एनालिटिक्स' : 'Analytics', icon: BarChart3, variant: 'outline' as const, onClick: () => navigate('/analytics') },
-  ];
-
+  const recentActivities: ActivityItem[] = [{
+    id: '1',
+    type: 'inquiry',
+    title: 'New inquiry received',
+    description: 'Ramesh Kumar asked about fungicides',
+    timestamp: new Date().toISOString()
+  }, {
+    id: '2',
+    type: 'response',
+    title: 'Response sent',
+    description: 'Replied to Sunil Yadav',
+    timestamp: new Date(Date.now() - 3600000).toISOString()
+  }, {
+    id: '3',
+    type: 'product',
+    title: 'Product updated',
+    description: 'Updated stock for Mancozeb 75%',
+    timestamp: new Date(Date.now() - 7200000).toISOString()
+  }, {
+    id: '4',
+    type: 'sale',
+    title: 'New sale',
+    description: 'Sold 5 units of Neem Oil',
+    timestamp: new Date(Date.now() - 10800000).toISOString()
+  }];
+  const stats = [{
+    label: isHindi ? 'कुल उत्पाद' : 'Total Products',
+    value: totalProducts,
+    change: `${totalStock} stock`,
+    icon: Package,
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-100'
+  }, {
+    label: isHindi ? 'लंबित पूछताछ' : 'Pending Inquiries',
+    value: pendingInquiries,
+    change: urgentCount > 0 ? `${urgentCount} urgent` : undefined,
+    icon: MessageSquare,
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-100'
+  }, {
+    label: isHindi ? 'मासिक राजस्व' : 'Monthly Revenue',
+    value: `₹${(totalRevenue / 1000).toFixed(1)}K`,
+    change: '+18%',
+    icon: IndianRupee,
+    color: 'text-green-600',
+    bgColor: 'bg-green-100'
+  }, {
+    label: isHindi ? 'किसान संपर्क' : 'Farmers Reached',
+    value: totalFarmers,
+    change: '+12',
+    icon: Users,
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-100'
+  }];
+  const quickActions = [{
+    id: 'add-product',
+    label: isHindi ? 'उत्पाद जोड़ें' : 'Add Product',
+    icon: Plus,
+    variant: 'primary' as const,
+    onClick: () => navigate('/products')
+  }, {
+    id: 'inquiries',
+    label: isHindi ? 'पूछताछ' : 'Inquiries',
+    icon: MessageSquare,
+    variant: 'secondary' as const,
+    onClick: () => navigate('/inquiries')
+  }, {
+    id: 'new-quote',
+    label: isHindi ? 'कोटेशन' : 'New Quote',
+    icon: FileText,
+    variant: 'outline' as const,
+    onClick: () => navigate('/quotes/new')
+  }, {
+    id: 'analytics',
+    label: isHindi ? 'एनालिटिक्स' : 'Analytics',
+    icon: BarChart3,
+    variant: 'outline' as const,
+    onClick: () => navigate('/analytics')
+  }];
   const handleRespond = (id: string) => {
     const inquiry = dealerInquiries.find(i => i.id === id);
     if (inquiry) {
       setSelectedInquiry(inquiry);
     }
   };
-
   const handleCall = (id: string) => {
     toast.success(isHindi ? 'कॉल शुरू हो रहा है...' : 'Initiating call...');
   };
-
   const handleInquiryRespond = (id: string, response: string, productIds?: string[]) => {
     updateInquiryStatus(id, 'responded', response);
     toast.success(isHindi ? 'उत्तर भेजा गया' : 'Response sent');
     setSelectedInquiry(null);
   };
-
   const handleInquiryResolve = (id: string) => {
     updateInquiryStatus(id, 'resolved');
     toast.success(isHindi ? 'पूछताछ हल की गई' : 'Inquiry resolved');
     setSelectedInquiry(null);
   };
-
-  return (
-    <AppLayout>
+  return <AppLayout>
       <div className="container px-4 py-6 pb-24 space-y-5">
         {/* Welcome Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between"
-        >
+        <motion.div initial={{
+        opacity: 0,
+        y: -10
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} className="flex items-center justify-between">
           <div>
             <p className="text-sm text-muted-foreground">{isHindi ? 'स्वागत है' : 'Welcome back'},</p>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
               {user?.name || 'Dealer'}
-              <Store className="h-5 w-5 text-primary" />
+              
             </h1>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative rounded-xl"
-              onClick={() => navigate('/notifications')}
-            >
+            <Button variant="ghost" size="icon" className="relative rounded-xl" onClick={() => navigate('/notifications')}>
               <Bell className="h-5 w-5" />
-              {dealerNotifications.length > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive rounded-full text-[10px] text-white flex items-center justify-center">
+              {dealerNotifications.length > 0 && <span className="absolute -top-1 -right-1 h-4 w-4 bg-destructive rounded-full text-[10px] text-white flex items-center justify-center">
                   {dealerNotifications.length}
-                </span>
-              )}
+                </span>}
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-xl"
-              onClick={() => navigate('/settings')}
-            >
+            <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => navigate('/settings')}>
               <Settings className="h-5 w-5" />
             </Button>
           </div>
         </motion.div>
 
         {/* Quick Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.05 }}
-        >
+        <motion.div initial={{
+        opacity: 0,
+        y: 10
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} transition={{
+        delay: 0.05
+      }}>
           <QuickActions actions={quickActions} />
         </motion.div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
-          {stats.map((stat, index) => (
-            <StatsCard 
-              key={stat.label} 
-              {...stat} 
-              index={index}
-              onClick={() => {
-                if (stat.label.includes('Product')) navigate('/products');
-                else if (stat.label.includes('Inquir')) navigate('/inquiries');
-                else if (stat.label.includes('Revenue')) navigate('/analytics');
-              }}
-            />
-          ))}
+          {stats.map((stat, index) => <StatsCard key={stat.label} {...stat} index={index} onClick={() => {
+          if (stat.label.includes('Product')) navigate('/products');else if (stat.label.includes('Inquir')) navigate('/inquiries');else if (stat.label.includes('Revenue')) navigate('/analytics');
+        }} />)}
         </div>
 
         {/* Urgent Inquiries */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <UrgentInquiries
-            inquiries={dealerInquiries}
-            onRespond={handleRespond}
-            onCall={handleCall}
-            onViewAll={() => navigate('/inquiries')}
-            onViewDetails={(inquiry) => setSelectedInquiry(inquiry)}
-          />
+        <motion.div initial={{
+        opacity: 0,
+        y: 20
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} transition={{
+        delay: 0.2
+      }}>
+          <UrgentInquiries inquiries={dealerInquiries} onRespond={handleRespond} onCall={handleCall} onViewAll={() => navigate('/inquiries')} onViewDetails={inquiry => setSelectedInquiry(inquiry)} />
         </motion.div>
 
         {/* Low Stock Alert */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-        >
-          <InventoryAlert
-            items={lowStockItems}
-            onReorder={(id) => navigate('/products')}
-          />
+        <motion.div initial={{
+        opacity: 0,
+        y: 20
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} transition={{
+        delay: 0.25
+      }}>
+          <InventoryAlert items={lowStockItems} onReorder={id => navigate('/products')} />
         </motion.div>
 
         {/* Top Selling Products */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <TopProducts
-            products={topProducts}
-            title={isHindi ? 'सबसे ज्यादा बिकने वाले' : 'Top Selling'}
-            onViewAll={() => navigate('/products')}
-            onViewProduct={() => navigate('/products')}
-          />
+        <motion.div initial={{
+        opacity: 0,
+        y: 20
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} transition={{
+        delay: 0.3
+      }}>
+          <TopProducts products={topProducts} title={isHindi ? 'सबसे ज्यादा बिकने वाले' : 'Top Selling'} onViewAll={() => navigate('/products')} onViewProduct={() => navigate('/products')} />
         </motion.div>
 
         {/* Recent Activity */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35 }}
-        >
-          <ActivityTimeline
-            activities={recentActivities}
-            title={isHindi ? 'हाल की गतिविधि' : 'Recent Activity'}
-          />
+        <motion.div initial={{
+        opacity: 0,
+        y: 20
+      }} animate={{
+        opacity: 1,
+        y: 0
+      }} transition={{
+        delay: 0.35
+      }}>
+          <ActivityTimeline activities={recentActivities} title={isHindi ? 'हाल की गतिविधि' : 'Recent Activity'} />
         </motion.div>
       </div>
 
       {/* Inquiry Detail Modal */}
       <AnimatePresence>
-        {selectedInquiry && (
-          <InquiryDetailModal
-            inquiry={selectedInquiry}
-            products={dealerProducts}
-            onClose={() => setSelectedInquiry(null)}
-            onRespond={handleInquiryRespond}
-            onResolve={handleInquiryResolve}
-            onCall={handleCall}
-          />
-        )}
+        {selectedInquiry && <InquiryDetailModal inquiry={selectedInquiry} products={dealerProducts} onClose={() => setSelectedInquiry(null)} onRespond={handleInquiryRespond} onResolve={handleInquiryResolve} onCall={handleCall} />}
       </AnimatePresence>
-    </AppLayout>
-  );
+    </AppLayout>;
 };
-
 export default DealerDashboard;
