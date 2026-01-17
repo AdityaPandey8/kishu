@@ -28,6 +28,8 @@ import Search from "./pages/Search";
 import Products from "./pages/Products";
 import Inquiries from "./pages/Inquiries";
 import Users from "./pages/Users";
+import DealerAnalytics from "./pages/DealerAnalytics";
+import QuoteBuilder from "./pages/QuoteBuilder";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -62,6 +64,8 @@ const App = () => (
                 <Route path="/products" element={<Products />} />
                 <Route path="/inquiries" element={<Inquiries />} />
                 <Route path="/users" element={<Users />} />
+                <Route path="/analytics" element={<DealerAnalytics />} />
+                <Route path="/quotes/new" element={<QuoteBuilder />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

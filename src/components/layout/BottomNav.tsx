@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Camera, History, User, Users } from 'lucide-react';
+import { Home, Camera, History, User, Users, Package, MessageSquare, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -11,13 +11,46 @@ export const BottomNav = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const navItems = [
+  // Farmer navigation items
+  const farmerNavItems = [
     { key: 'home', icon: Home, path: '/', label: t('nav.home') },
     { key: 'scan', icon: Camera, path: '/scan', label: t('nav.scan') },
     { key: 'community', icon: Users, path: '/community', label: 'Community' },
     { key: 'history', icon: History, path: '/history', label: t('nav.history') },
     { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
   ];
+
+  // Dealer navigation items - customized for dealer workflow
+  const dealerNavItems = [
+    { key: 'home', icon: Home, path: '/', label: 'Dashboard' },
+    { key: 'products', icon: Package, path: '/products', label: 'Products' },
+    { key: 'inquiries', icon: MessageSquare, path: '/inquiries', label: 'Inquiries' },
+    { key: 'analytics', icon: TrendingUp, path: '/analytics', label: 'Analytics' },
+    { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
+  ];
+
+  // Admin navigation items
+  const adminNavItems = [
+    { key: 'home', icon: Home, path: '/', label: 'Dashboard' },
+    { key: 'users', icon: Users, path: '/users', label: 'Users' },
+    { key: 'community', icon: MessageSquare, path: '/community', label: 'Community' },
+    { key: 'analytics', icon: TrendingUp, path: '/analytics', label: 'Analytics' },
+    { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
+  ];
+
+  // Select nav items based on user role
+  const getNavItems = () => {
+    switch (user?.role) {
+      case 'dealer':
+        return dealerNavItems;
+      case 'admin':
+        return adminNavItems;
+      default:
+        return farmerNavItems;
+    }
+  };
+
+  const navItems = getNavItems();
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-inset">
