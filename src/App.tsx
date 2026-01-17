@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { DataProvider } from "@/contexts/DataContext";
+import { SettingsProvider } from "@/contexts/SettingsContext";
 import { OfflineIndicator } from "@/components/common/OfflineIndicator";
 import "@/i18n";
 
@@ -20,6 +22,12 @@ import Crops from "./pages/Crops";
 import CropDetail from "./pages/CropDetail";
 import Community from "./pages/Community";
 import WeatherAlerts from "./pages/WeatherAlerts";
+import Notifications from "./pages/Notifications";
+import Help from "./pages/Help";
+import Search from "./pages/Search";
+import Products from "./pages/Products";
+import Inquiries from "./pages/Inquiries";
+import Users from "./pages/Users";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,30 +35,39 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <OfflineIndicator />
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/scan" element={<Scan />} />
-            <Route path="/history" element={<History />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/diagnosis/:id" element={<Diagnosis />} />
-            <Route path="/crops" element={<Crops />} />
-            <Route path="/crops/:id" element={<CropDetail />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/weather-alerts" element={<WeatherAlerts />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <SettingsProvider>
+        <DataProvider>
+          <TooltipProvider>
+            <OfflineIndicator />
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/scan" element={<Scan />} />
+                <Route path="/history" element={<History />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/diagnosis/:id" element={<Diagnosis />} />
+                <Route path="/crops" element={<Crops />} />
+                <Route path="/crops/:id" element={<CropDetail />} />
+                <Route path="/community" element={<Community />} />
+                <Route path="/weather-alerts" element={<WeatherAlerts />} />
+                <Route path="/notifications" element={<Notifications />} />
+                <Route path="/help" element={<Help />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/inquiries" element={<Inquiries />} />
+                <Route path="/users" element={<Users />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </DataProvider>
+      </SettingsProvider>
     </AuthProvider>
   </QueryClientProvider>
 );
