@@ -70,7 +70,7 @@ const Inquiries = () => {
   ];
 
   return (
-    <AppLayout hideNav>
+    <AppLayout>
       <div className="container px-4 py-4 pb-8">
         {/* Header */}
         <motion.div

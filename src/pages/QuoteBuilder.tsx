@@ -106,7 +106,7 @@ ${notes ? `Notes: ${notes}` : ''}
   };
 
   return (
-    <AppLayout hideNav>
+    <AppLayout>
       <div className="container px-4 py-4 pb-24">
         {/* Header */}
         <motion.div

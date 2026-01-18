@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, Globe, User, LogIn, Bell, Search, Moon, Sun } from 'lucide-react';
+import { Leaf, Globe, User, LogIn, Bell, Search, Moon, Sun, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -28,99 +28,173 @@ export const Header = () => {
   };
 
   const currentLang = i18n.language;
+  const isHindi = currentLang === 'hi';
   const isAuthPage = ['/login', '/signup', '/forgot-password'].includes(location.pathname);
 
   if (isAuthPage) return null;
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return isHindi ? 'सुप्रभात' : 'Good Morning';
+    if (hour < 17) return isHindi ? 'शुभ दोपहर' : 'Good Afternoon';
+    return isHindi ? 'शुभ संध्या' : 'Good Evening';
+  };
+
+  const getRoleLabel = () => {
+    if (!user) return '';
+    switch (user.role) {
+      case 'farmer': return isHindi ? 'किसान' : 'Farmer';
+      case 'dealer': return isHindi ? 'डीलर' : 'Dealer';
+      case 'admin': return isHindi ? 'एडमिन' : 'Admin';
+      default: return '';
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-inset">
-      <div className="container flex h-14 items-center justify-between px-4">
-        {/* Logo */}
+    <header className="sticky top-0 z-50 w-full safe-area-inset">
+      {/* Glass-morphism header background */}
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-xl border-b border-border/40" />
+      
+      {/* Gradient accent line */}
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+      
+      <div className="container relative flex h-16 items-center justify-between px-4">
+        {/* Logo & Greeting */}
         <motion.button 
           onClick={() => navigate('/')}
-          className="flex items-center gap-2"
+          className="flex items-center gap-3"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl gradient-kishu shadow-kishu">
+          <motion.div 
+            className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg"
+            whileHover={{ rotate: [0, -10, 10, 0] }}
+            transition={{ duration: 0.5 }}
+          >
             <Leaf className="h-5 w-5 text-primary-foreground" />
-          </div>
+            {/* Glow effect */}
+            <div className="absolute inset-0 rounded-xl bg-primary/30 blur-lg -z-10" />
+          </motion.div>
           <div className="flex flex-col">
-            <span className="text-lg font-bold text-gradient-kishu leading-tight">
-              {t('common.appName')}
-            </span>
-            <span className="text-[10px] text-muted-foreground leading-none hidden sm:block">
-              {t('common.tagline')}
-            </span>
+            {user ? (
+              <>
+                <span className="text-xs text-muted-foreground leading-tight">
+                  {getGreeting()}
+                </span>
+                <span className="text-sm font-semibold text-foreground leading-tight truncate max-w-[120px]">
+                  {user.name?.split(' ')[0] || getRoleLabel()}
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-lg font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent leading-tight">
+                  {t('common.appName')}
+                </span>
+                <span className="text-[10px] text-muted-foreground leading-none hidden sm:block">
+                  {t('common.tagline')}
+                </span>
+              </>
+            )}
           </div>
         </motion.button>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-1">
+        <motion.div 
+          className="flex items-center gap-1"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
           {/* Search */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 rounded-xl"
-            onClick={() => navigate('/search')}
-          >
-            <Search className="h-4 w-4 text-muted-foreground" />
-          </Button>
-
-          {/* Dark Mode Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 rounded-xl"
-            onClick={toggleDarkMode}
-          >
-            {settings.darkMode ? (
-              <Sun className="h-4 w-4 text-muted-foreground" />
-            ) : (
-              <Moon className="h-4 w-4 text-muted-foreground" />
-            )}
-          </Button>
-
-          {/* Notifications */}
-          {user && (
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-xl relative"
-              onClick={() => navigate('/notifications')}
+              className="h-9 w-9 rounded-xl hover:bg-primary/10"
+              onClick={() => navigate('/search')}
             >
-              <Bell className="h-4 w-4 text-muted-foreground" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-[10px] text-white flex items-center justify-center font-medium">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
+              <Search className="h-4 w-4 text-muted-foreground" />
             </Button>
+          </motion.div>
+
+          {/* Dark Mode Toggle */}
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 rounded-xl hover:bg-primary/10"
+              onClick={toggleDarkMode}
+            >
+              <motion.div
+                initial={false}
+                animate={{ rotate: settings.darkMode ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {settings.darkMode ? (
+                  <Sun className="h-4 w-4 text-amber-500" />
+                ) : (
+                  <Moon className="h-4 w-4 text-muted-foreground" />
+                )}
+              </motion.div>
+            </Button>
+          </motion.div>
+
+          {/* Notifications */}
+          {user && (
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-xl relative hover:bg-primary/10"
+                onClick={() => navigate('/notifications')}
+              >
+                <Bell className="h-4 w-4 text-muted-foreground" />
+                {unreadCount > 0 && (
+                  <motion.span 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-[10px] text-white flex items-center justify-center font-medium shadow-lg"
+                  >
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </motion.span>
+                )}
+              </Button>
+            </motion.div>
           )}
 
           {/* Language Toggle */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="h-9 gap-1.5 px-2.5 text-muted-foreground hover:text-foreground"
-              >
-                <Globe className="h-4 w-4" />
-                <span className="text-xs font-medium uppercase">{currentLang}</span>
-              </Button>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="h-9 gap-1.5 px-2.5 text-muted-foreground hover:text-foreground hover:bg-primary/10 rounded-xl"
+                >
+                  <Globe className="h-4 w-4" />
+                  <span className="text-xs font-medium uppercase">{currentLang}</span>
+                </Button>
+              </motion.div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[120px]">
+            <DropdownMenuContent align="end" className="min-w-[120px] rounded-xl">
               <DropdownMenuItem 
                 onClick={() => toggleLanguage('en')}
-                className={cn(currentLang === 'en' && 'bg-primary/10 text-primary')}
+                className={cn(
+                  'rounded-lg cursor-pointer',
+                  currentLang === 'en' && 'bg-primary/10 text-primary'
+                )}
               >
                 🇬🇧 English
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => toggleLanguage('hi')}
-                className={cn(currentLang === 'hi' && 'bg-primary/10 text-primary')}
+                className={cn(
+                  'rounded-lg cursor-pointer',
+                  currentLang === 'hi' && 'bg-primary/10 text-primary'
+                )}
               >
                 🇮🇳 हिंदी
               </DropdownMenuItem>
@@ -129,27 +203,33 @@ export const Header = () => {
 
           {/* Auth / Profile */}
           {user ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-xl"
-              onClick={() => navigate('/profile')}
-            >
-              <div className="h-7 w-7 rounded-lg gradient-kishu flex items-center justify-center">
-                <User className="h-4 w-4 text-primary-foreground" />
-              </div>
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-9 w-9 rounded-xl p-0 overflow-hidden hover:ring-2 hover:ring-primary/30"
+                onClick={() => navigate('/profile')}
+              >
+                <div className="h-full w-full rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 flex items-center justify-center relative">
+                  <User className="h-4 w-4 text-primary-foreground" />
+                  {/* Online indicator */}
+                  <span className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-green-500 ring-2 ring-background" />
+                </div>
+              </Button>
+            </motion.div>
           ) : (
-            <Button
-              size="sm"
-              className="h-9 rounded-xl gradient-kishu shadow-kishu"
-              onClick={() => navigate('/login')}
-            >
-              <LogIn className="h-4 w-4 mr-1" />
-              {t('auth.login')}
-            </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                size="sm"
+                className="h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25"
+                onClick={() => navigate('/login')}
+              >
+                <LogIn className="h-4 w-4 mr-1" />
+                {t('auth.login')}
+              </Button>
+            </motion.div>
           )}
-        </div>
+        </motion.div>
       </div>
     </header>
   );

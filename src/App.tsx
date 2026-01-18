@@ -30,6 +30,8 @@ import Inquiries from "./pages/Inquiries";
 import Users from "./pages/Users";
 import DealerAnalytics from "./pages/DealerAnalytics";
 import QuoteBuilder from "./pages/QuoteBuilder";
+import Customers from "./pages/Customers";
+import CustomerDetail from "./pages/CustomerDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -66,6 +68,8 @@ const App = () => (
                 <Route path="/users" element={<Users />} />
                 <Route path="/analytics" element={<DealerAnalytics />} />
                 <Route path="/quotes/new" element={<QuoteBuilder />} />
+                <Route path="/customers" element={<Customers />} />
+                <Route path="/customers/:id" element={<CustomerDetail />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
