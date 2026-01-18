@@ -58,7 +58,7 @@ const Search = () => {
   const hasResults = results.diagnoses.length > 0 || results.posts.length > 0 || results.products.length > 0;
 
   return (
-    <AppLayout hideNav>
+    <AppLayout>
       <div className="container px-4 py-4">
         {/* Header */}
         <motion.div

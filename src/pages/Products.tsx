@@ -117,7 +117,7 @@ const Products = () => {
   const totalValue = dealerProducts.reduce((acc, p) => acc + (p.price * p.stock), 0);
 
   return (
-    <AppLayout hideNav>
+    <AppLayout>
       <div className="container px-4 py-4 pb-8">
         {/* Header */}
         <motion.div

@@ -39,7 +39,7 @@ const Notifications = () => {
   const unreadCount = userNotifications.filter(n => !n.read).length;
 
   return (
-    <AppLayout hideNav>
+    <AppLayout>
       <div className="container px-4 py-4">
         {/* Header */}
         <motion.div

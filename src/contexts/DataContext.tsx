@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 // Types
@@ -85,6 +85,46 @@ export interface PlatformUser {
   location?: string;
 }
 
+// CRM Types
+export interface Customer {
+  id: string;
+  farmerId: string;
+  dealerId: string;
+  farmerName: string;
+  phone: string;
+  email: string;
+  location: string;
+  crops: string[];
+  firstContact: string;
+  lastContact: string;
+  totalInquiries: number;
+  totalPurchases: number;
+  status: 'active' | 'inactive' | 'vip';
+  isFavorite: boolean;
+}
+
+export interface CustomerNote {
+  id: string;
+  customerId: string;
+  dealerId: string;
+  content: string;
+  createdAt: string;
+  type: 'general' | 'followup' | 'issue' | 'purchase';
+}
+
+export interface FollowUpReminder {
+  id: string;
+  customerId: string;
+  dealerId: string;
+  customerName: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  completed: boolean;
+  priority: 'low' | 'medium' | 'high';
+  createdAt: string;
+}
+
 interface DataContextType {
   // Diagnoses
   diagnoses: Diagnosis[];
@@ -122,6 +162,27 @@ interface DataContextType {
   platformUsers: PlatformUser[];
   updateUserStatus: (id: string, status: PlatformUser['status']) => void;
   updateUserRole: (id: string, role: PlatformUser['role']) => void;
+
+  // Customers (CRM)
+  customers: Customer[];
+  addCustomer: (customer: Omit<Customer, 'id' | 'firstContact' | 'lastContact' | 'totalInquiries' | 'totalPurchases'>) => void;
+  updateCustomer: (id: string, data: Partial<Customer>) => void;
+  toggleFavoriteCustomer: (id: string) => void;
+  getCustomerById: (id: string) => Customer | undefined;
+
+  // Customer Notes
+  customerNotes: CustomerNote[];
+  addCustomerNote: (note: Omit<CustomerNote, 'id' | 'createdAt'>) => void;
+  deleteCustomerNote: (id: string) => void;
+  getNotesForCustomer: (customerId: string) => CustomerNote[];
+
+  // Follow-up Reminders
+  followUpReminders: FollowUpReminder[];
+  addFollowUpReminder: (reminder: Omit<FollowUpReminder, 'id' | 'createdAt' | 'completed'>) => void;
+  completeFollowUp: (id: string) => void;
+  deleteFollowUp: (id: string) => void;
+  getRemindersForDealer: (dealerId: string) => FollowUpReminder[];
+  getPendingRemindersCount: (dealerId: string) => number;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -185,6 +246,164 @@ const seedPlatformUsers: PlatformUser[] = [
   { id: 'd3', email: 'agrisolutions@email.com', name: 'Agri Solutions Pvt Ltd', role: 'dealer', status: 'pending', createdAt: 'Jan 14, 2026', lastActive: 'Jan 14, 2026', location: 'Mumbai, MH' },
 ];
 
+// CRM Seed Data
+const seedCustomers: Customer[] = [
+  {
+    id: 'c1',
+    farmerId: 'farmer-001',
+    dealerId: 'dealer-001',
+    farmerName: 'Ramesh Kumar',
+    phone: '+91 9876543210',
+    email: 'ramesh@email.com',
+    location: 'Jaipur, RJ',
+    crops: ['Tomato', 'Wheat', 'Cotton'],
+    firstContact: '2025-12-15',
+    lastContact: '2026-01-15',
+    totalInquiries: 3,
+    totalPurchases: 2,
+    status: 'vip',
+    isFavorite: true,
+  },
+  {
+    id: 'c2',
+    farmerId: 'f2',
+    dealerId: 'dealer-001',
+    farmerName: 'Sunil Yadav',
+    phone: '+91 9876543211',
+    email: 'sunil@email.com',
+    location: 'Lucknow, UP',
+    crops: ['Rice', 'Sugarcane'],
+    firstContact: '2026-01-05',
+    lastContact: '2026-01-16',
+    totalInquiries: 1,
+    totalPurchases: 0,
+    status: 'active',
+    isFavorite: false,
+  },
+  {
+    id: 'c3',
+    farmerId: 'f3',
+    dealerId: 'dealer-001',
+    farmerName: 'Priya Sharma',
+    phone: '+91 9876543212',
+    email: 'priya@email.com',
+    location: 'Ahmedabad, GJ',
+    crops: ['Cotton', 'Groundnut'],
+    firstContact: '2025-11-20',
+    lastContact: '2026-01-10',
+    totalInquiries: 5,
+    totalPurchases: 4,
+    status: 'vip',
+    isFavorite: true,
+  },
+  {
+    id: 'c4',
+    farmerId: 'f4',
+    dealerId: 'dealer-001',
+    farmerName: 'Mohan Singh',
+    phone: '+91 9876543213',
+    email: 'mohan@email.com',
+    location: 'Bhopal, MP',
+    crops: ['Wheat', 'Soybean'],
+    firstContact: '2026-01-08',
+    lastContact: '2026-01-14',
+    totalInquiries: 2,
+    totalPurchases: 1,
+    status: 'active',
+    isFavorite: false,
+  },
+  {
+    id: 'c5',
+    farmerId: 'f5',
+    dealerId: 'dealer-001',
+    farmerName: 'Geeta Devi',
+    phone: '+91 9876543214',
+    email: 'geeta@email.com',
+    location: 'Patna, BR',
+    crops: ['Potato', 'Maize'],
+    firstContact: '2025-12-01',
+    lastContact: '2026-01-12',
+    totalInquiries: 4,
+    totalPurchases: 3,
+    status: 'active',
+    isFavorite: false,
+  },
+];
+
+const seedCustomerNotes: CustomerNote[] = [
+  {
+    id: 'cn1',
+    customerId: 'c1',
+    dealerId: 'dealer-001',
+    content: 'Prefers organic products. Budget conscious but willing to pay for quality.',
+    createdAt: '2026-01-10T10:00:00Z',
+    type: 'general',
+  },
+  {
+    id: 'cn2',
+    customerId: 'c1',
+    dealerId: 'dealer-001',
+    content: 'Follow up on fungicide effectiveness after 2 weeks.',
+    createdAt: '2026-01-15T14:30:00Z',
+    type: 'followup',
+  },
+  {
+    id: 'cn3',
+    customerId: 'c3',
+    dealerId: 'dealer-001',
+    content: 'Manages 50 acres. Key customer for bulk orders.',
+    createdAt: '2026-01-05T09:00:00Z',
+    type: 'general',
+  },
+  {
+    id: 'cn4',
+    customerId: 'c5',
+    dealerId: 'dealer-001',
+    content: 'Had issue with late blight. Resolved with Mancozeb treatment.',
+    createdAt: '2026-01-12T16:00:00Z',
+    type: 'issue',
+  },
+];
+
+const seedFollowUpReminders: FollowUpReminder[] = [
+  {
+    id: 'fr1',
+    customerId: 'c1',
+    dealerId: 'dealer-001',
+    customerName: 'Ramesh Kumar',
+    title: 'Check on wheat treatment',
+    description: 'Follow up on the fungicide recommendation for early blight',
+    dueDate: '2026-01-20',
+    completed: false,
+    priority: 'high',
+    createdAt: '2026-01-15T10:00:00Z',
+  },
+  {
+    id: 'fr2',
+    customerId: 'c3',
+    dealerId: 'dealer-001',
+    customerName: 'Priya Sharma',
+    title: 'Bulk order discussion',
+    description: 'Discuss fertilizer requirements for next season',
+    dueDate: '2026-01-22',
+    completed: false,
+    priority: 'medium',
+    createdAt: '2026-01-14T11:00:00Z',
+  },
+  {
+    id: 'fr3',
+    customerId: 'c2',
+    dealerId: 'dealer-001',
+    customerName: 'Sunil Yadav',
+    title: 'Send product catalog',
+    description: 'Share organic product options for rice cultivation',
+    dueDate: '2026-01-19',
+    completed: false,
+    priority: 'low',
+    createdAt: '2026-01-16T08:00:00Z',
+  },
+];
+
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [diagnoses, setDiagnoses] = useLocalStorage<Diagnosis[]>('kishu-diagnoses', seedDiagnoses);
   const [products, setProducts] = useLocalStorage<Product[]>('kishu-products', seedProducts);
@@ -192,9 +411,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [posts, setPosts] = useLocalStorage<Post[]>('kishu-posts', seedPosts);
   const [notifications, setNotifications] = useLocalStorage<Notification[]>('kishu-notifications', seedNotifications);
   const [platformUsers, setPlatformUsers] = useLocalStorage<PlatformUser[]>('kishu-platform-users', seedPlatformUsers);
+  const [customers, setCustomers] = useLocalStorage<Customer[]>('kishu-customers', seedCustomers);
+  const [customerNotes, setCustomerNotes] = useLocalStorage<CustomerNote[]>('kishu-customer-notes', seedCustomerNotes);
+  const [followUpReminders, setFollowUpReminders] = useLocalStorage<FollowUpReminder[]>('kishu-followups', seedFollowUpReminders);
 
   // Diagnoses
-  const addDiagnosis = (diagnosis: Omit<Diagnosis, 'id' | 'date'>): Diagnosis => {
+  const addDiagnosis = useCallback((diagnosis: Omit<Diagnosis, 'id' | 'date'>): Diagnosis => {
     const newDiagnosis: Diagnosis = {
       ...diagnosis,
       id: `d${Date.now()}`,
@@ -202,20 +424,20 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     };
     setDiagnoses(prev => [newDiagnosis, ...prev]);
     return newDiagnosis;
-  };
+  }, [setDiagnoses]);
 
-  const deleteDiagnosis = (id: string) => {
+  const deleteDiagnosis = useCallback((id: string) => {
     setDiagnoses(prev => prev.filter(d => d.id !== id));
-  };
+  }, [setDiagnoses]);
 
-  const toggleBookmark = (id: string) => {
+  const toggleBookmark = useCallback((id: string) => {
     setDiagnoses(prev => prev.map(d => 
       d.id === id ? { ...d, bookmarked: !d.bookmarked } : d
     ));
-  };
+  }, [setDiagnoses]);
 
   // Products
-  const addProduct = (product: Omit<Product, 'id' | 'sales' | 'createdAt'>) => {
+  const addProduct = useCallback((product: Omit<Product, 'id' | 'sales' | 'createdAt'>) => {
     const newProduct: Product = {
       ...product,
       id: `p${Date.now()}`,
@@ -223,18 +445,18 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     };
     setProducts(prev => [newProduct, ...prev]);
-  };
+  }, [setProducts]);
 
-  const updateProduct = (id: string, data: Partial<Product>) => {
+  const updateProduct = useCallback((id: string, data: Partial<Product>) => {
     setProducts(prev => prev.map(p => p.id === id ? { ...p, ...data } : p));
-  };
+  }, [setProducts]);
 
-  const deleteProduct = (id: string) => {
+  const deleteProduct = useCallback((id: string) => {
     setProducts(prev => prev.filter(p => p.id !== id));
-  };
+  }, [setProducts]);
 
   // Inquiries
-  const addInquiry = (inquiry: Omit<Inquiry, 'id' | 'createdAt' | 'status'>) => {
+  const addInquiry = useCallback((inquiry: Omit<Inquiry, 'id' | 'createdAt' | 'status'>) => {
     const newInquiry: Inquiry = {
       ...inquiry,
       id: `i${Date.now()}`,
@@ -242,16 +464,16 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       createdAt: new Date().toISOString(),
     };
     setInquiries(prev => [newInquiry, ...prev]);
-  };
+  }, [setInquiries]);
 
-  const updateInquiryStatus = (id: string, status: Inquiry['status'], response?: string) => {
+  const updateInquiryStatus = useCallback((id: string, status: Inquiry['status'], response?: string) => {
     setInquiries(prev => prev.map(i => 
       i.id === id ? { ...i, status, response: response || i.response } : i
     ));
-  };
+  }, [setInquiries]);
 
   // Posts
-  const addPost = (post: Omit<Post, 'id' | 'likes' | 'comments' | 'createdAt'>) => {
+  const addPost = useCallback((post: Omit<Post, 'id' | 'likes' | 'comments' | 'createdAt'>) => {
     const newPost: Post = {
       ...post,
       id: `post${Date.now()}`,
@@ -260,9 +482,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       createdAt: new Date().toISOString(),
     };
     setPosts(prev => [newPost, ...prev]);
-  };
+  }, [setPosts]);
 
-  const toggleLike = (postId: string, userId: string) => {
+  const toggleLike = useCallback((postId: string, userId: string) => {
     setPosts(prev => prev.map(p => {
       if (p.id !== postId) return p;
       const likes = p.likes.includes(userId) 
@@ -270,9 +492,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         : [...p.likes, userId];
       return { ...p, likes };
     }));
-  };
+  }, [setPosts]);
 
-  const addComment = (postId: string, comment: Omit<Comment, 'id' | 'createdAt'>) => {
+  const addComment = useCallback((postId: string, comment: Omit<Comment, 'id' | 'createdAt'>) => {
     const newComment: Comment = {
       ...comment,
       id: `c${Date.now()}`,
@@ -281,14 +503,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     setPosts(prev => prev.map(p => 
       p.id === postId ? { ...p, comments: [...p.comments, newComment] } : p
     ));
-  };
+  }, [setPosts]);
 
-  const deletePost = (id: string) => {
+  const deletePost = useCallback((id: string) => {
     setPosts(prev => prev.filter(p => p.id !== id));
-  };
+  }, [setPosts]);
 
   // Notifications
-  const addNotification = (notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => {
+  const addNotification = useCallback((notification: Omit<Notification, 'id' | 'createdAt' | 'read'>) => {
     const newNotification: Notification = {
       ...notification,
       id: `n${Date.now()}`,
@@ -296,32 +518,107 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       createdAt: new Date().toISOString(),
     };
     setNotifications(prev => [newNotification, ...prev]);
-  };
+  }, [setNotifications]);
 
-  const markAsRead = (id: string) => {
+  const markAsRead = useCallback((id: string) => {
     setNotifications(prev => prev.map(n => 
       n.id === id ? { ...n, read: true } : n
     ));
-  };
+  }, [setNotifications]);
 
-  const markAllAsRead = () => {
+  const markAllAsRead = useCallback(() => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
+  }, [setNotifications]);
 
-  const deleteNotification = (id: string) => {
+  const deleteNotification = useCallback((id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
-  };
+  }, [setNotifications]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   // Platform Users
-  const updateUserStatus = (id: string, status: PlatformUser['status']) => {
+  const updateUserStatus = useCallback((id: string, status: PlatformUser['status']) => {
     setPlatformUsers(prev => prev.map(u => u.id === id ? { ...u, status } : u));
-  };
+  }, [setPlatformUsers]);
 
-  const updateUserRole = (id: string, role: PlatformUser['role']) => {
+  const updateUserRole = useCallback((id: string, role: PlatformUser['role']) => {
     setPlatformUsers(prev => prev.map(u => u.id === id ? { ...u, role } : u));
-  };
+  }, [setPlatformUsers]);
+
+  // Customers (CRM)
+  const addCustomer = useCallback((customer: Omit<Customer, 'id' | 'firstContact' | 'lastContact' | 'totalInquiries' | 'totalPurchases'>) => {
+    const now = new Date().toISOString().split('T')[0];
+    const newCustomer: Customer = {
+      ...customer,
+      id: `c${Date.now()}`,
+      firstContact: now,
+      lastContact: now,
+      totalInquiries: 0,
+      totalPurchases: 0,
+    };
+    setCustomers(prev => [newCustomer, ...prev]);
+  }, [setCustomers]);
+
+  const updateCustomer = useCallback((id: string, data: Partial<Customer>) => {
+    setCustomers(prev => prev.map(c => c.id === id ? { ...c, ...data } : c));
+  }, [setCustomers]);
+
+  const toggleFavoriteCustomer = useCallback((id: string) => {
+    setCustomers(prev => prev.map(c => 
+      c.id === id ? { ...c, isFavorite: !c.isFavorite } : c
+    ));
+  }, [setCustomers]);
+
+  const getCustomerById = useCallback((id: string) => {
+    return customers.find(c => c.id === id);
+  }, [customers]);
+
+  // Customer Notes
+  const addCustomerNote = useCallback((note: Omit<CustomerNote, 'id' | 'createdAt'>) => {
+    const newNote: CustomerNote = {
+      ...note,
+      id: `cn${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    setCustomerNotes(prev => [newNote, ...prev]);
+  }, [setCustomerNotes]);
+
+  const deleteCustomerNote = useCallback((id: string) => {
+    setCustomerNotes(prev => prev.filter(n => n.id !== id));
+  }, [setCustomerNotes]);
+
+  const getNotesForCustomer = useCallback((customerId: string) => {
+    return customerNotes.filter(n => n.customerId === customerId);
+  }, [customerNotes]);
+
+  // Follow-up Reminders
+  const addFollowUpReminder = useCallback((reminder: Omit<FollowUpReminder, 'id' | 'createdAt' | 'completed'>) => {
+    const newReminder: FollowUpReminder = {
+      ...reminder,
+      id: `fr${Date.now()}`,
+      completed: false,
+      createdAt: new Date().toISOString(),
+    };
+    setFollowUpReminders(prev => [newReminder, ...prev]);
+  }, [setFollowUpReminders]);
+
+  const completeFollowUp = useCallback((id: string) => {
+    setFollowUpReminders(prev => prev.map(r => 
+      r.id === id ? { ...r, completed: true } : r
+    ));
+  }, [setFollowUpReminders]);
+
+  const deleteFollowUp = useCallback((id: string) => {
+    setFollowUpReminders(prev => prev.filter(r => r.id !== id));
+  }, [setFollowUpReminders]);
+
+  const getRemindersForDealer = useCallback((dealerId: string) => {
+    return followUpReminders.filter(r => r.dealerId === dealerId);
+  }, [followUpReminders]);
+
+  const getPendingRemindersCount = useCallback((dealerId: string) => {
+    return followUpReminders.filter(r => r.dealerId === dealerId && !r.completed).length;
+  }, [followUpReminders]);
 
   return (
     <DataContext.Provider value={{
@@ -331,6 +628,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       posts, addPost, toggleLike, addComment, deletePost,
       notifications, addNotification, markAsRead, markAllAsRead, deleteNotification, unreadCount,
       platformUsers, updateUserStatus, updateUserRole,
+      customers, addCustomer, updateCustomer, toggleFavoriteCustomer, getCustomerById,
+      customerNotes, addCustomerNote, deleteCustomerNote, getNotesForCustomer,
+      followUpReminders, addFollowUpReminder, completeFollowUp, deleteFollowUp, getRemindersForDealer, getPendingRemindersCount,
     }}>
       {children}
     </DataContext.Provider>
