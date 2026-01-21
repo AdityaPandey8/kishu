@@ -1,5 +1,85 @@
-import { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import { createContext, useContext, ReactNode, useCallback } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+
+// Shop Types
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  farmerId: string;
+  dealerId: string;
+  dealerName: string;
+  items: OrderItem[];
+  totalAmount: number;
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  paymentMethod: 'cod' | 'online' | 'upi';
+  shippingAddress: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CartItem {
+  productId: string;
+  dealerId: string;
+  dealerName: string;
+  productName: string;
+  price: number;
+  quantity: number;
+  image?: string;
+}
+
+// Reel Types
+export interface ReelComment {
+  id: string;
+  userId: string;
+  userName: string;
+  content: string;
+  likes: string[];
+  createdAt: string;
+}
+
+export interface Reel {
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  creatorAvatar?: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  caption: string;
+  description: string;
+  tags: string[];
+  category: 'technique' | 'tips' | 'harvest' | 'equipment' | 'organic' | 'success-story';
+  likes: string[];
+  comments: ReelComment[];
+  shares: number;
+  views: number;
+  duration: number;
+  createdAt: string;
+}
+
+export interface Subscription {
+  id: string;
+  subscriberId: string;
+  creatorId: string;
+  createdAt: string;
+}
+
+export interface CreatorProfile {
+  userId: string;
+  isCreator: boolean;
+  bio: string;
+  coverImage?: string;
+  totalFollowers: number;
+  totalLikes: number;
+  totalViews: number;
+  reelIds: string[];
+  createdAt: string;
+}
 
 // Types
 export interface Diagnosis {
@@ -26,6 +106,8 @@ export interface Product {
   image?: string;
   sales: number;
   createdAt: string;
+  rating?: number;
+  reviews?: number;
 }
 
 export interface Inquiry {
@@ -66,7 +148,7 @@ export interface Comment {
 export interface Notification {
   id: string;
   userId: string;
-  type: 'weather' | 'disease' | 'inquiry' | 'system' | 'community';
+  type: 'weather' | 'disease' | 'inquiry' | 'system' | 'community' | 'order';
   title: string;
   message: string;
   read: boolean;
@@ -183,6 +265,53 @@ interface DataContextType {
   deleteFollowUp: (id: string) => void;
   getRemindersForDealer: (dealerId: string) => FollowUpReminder[];
   getPendingRemindersCount: (dealerId: string) => number;
+
+  // Shopping Cart
+  cart: CartItem[];
+  addToCart: (item: CartItem) => void;
+  updateCartQuantity: (productId: string, quantity: number) => void;
+  removeFromCart: (productId: string) => void;
+  clearCart: () => void;
+  getCartTotal: () => number;
+  getCartItemCount: () => number;
+
+  // Orders
+  orders: Order[];
+  placeOrder: (order: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>) => Order;
+  updateOrderStatus: (orderId: string, status: Order['status']) => void;
+  getOrdersByFarmer: (farmerId: string) => Order[];
+  getOrdersByDealer: (dealerId: string) => Order[];
+
+  // Reels
+  reels: Reel[];
+  addReel: (reel: Omit<Reel, 'id' | 'likes' | 'comments' | 'shares' | 'views' | 'createdAt'>) => Reel;
+  updateReel: (id: string, data: Partial<Reel>) => void;
+  deleteReel: (id: string) => void;
+  toggleReelLike: (reelId: string, userId: string) => void;
+  addReelComment: (reelId: string, comment: Omit<ReelComment, 'id' | 'likes' | 'createdAt'>) => void;
+  incrementReelViews: (reelId: string) => void;
+  incrementReelShares: (reelId: string) => void;
+  getReelsByCreator: (creatorId: string) => Reel[];
+
+  // Subscriptions
+  subscriptions: Subscription[];
+  subscribe: (creatorId: string, subscriberId: string) => void;
+  unsubscribe: (creatorId: string, subscriberId: string) => void;
+  isSubscribed: (creatorId: string, subscriberId: string) => boolean;
+  getSubscriberCount: (creatorId: string) => number;
+  getSubscribedCreators: (subscriberId: string) => string[];
+
+  // Creator Profiles
+  creatorProfiles: CreatorProfile[];
+  becomeCreator: (userId: string, bio: string) => void;
+  updateCreatorProfile: (userId: string, data: Partial<CreatorProfile>) => void;
+  getCreatorProfile: (userId: string) => CreatorProfile | undefined;
+  isCreator: (userId: string) => boolean;
+
+  // Saved Reels
+  savedReels: string[];
+  toggleSaveReel: (reelId: string) => void;
+  isSavedReel: (reelId: string) => boolean;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -205,14 +334,16 @@ const seedDiagnoses: Diagnosis[] = [
 ];
 
 const seedProducts: Product[] = [
-  { id: 'p1', dealerId: 'dealer-001', name: 'Mancozeb 75% WP', category: 'Fungicide', price: 450, stock: 120, description: 'Broad-spectrum fungicide', sales: 45, createdAt: 'Jan 1, 2026' },
-  { id: 'p2', dealerId: 'dealer-001', name: 'Neem Oil Organic', category: 'Organic', price: 320, stock: 85, description: 'Natural pest control', sales: 72, createdAt: 'Jan 1, 2026' },
-  { id: 'p3', dealerId: 'dealer-001', name: 'DAP Fertilizer', category: 'Fertilizer', price: 1200, stock: 200, description: 'Diammonium phosphate', sales: 38, createdAt: 'Jan 1, 2026' },
-  { id: 'p4', dealerId: 'dealer-001', name: 'Urea 46%', category: 'Fertilizer', price: 800, stock: 300, description: 'Nitrogen fertilizer', sales: 56, createdAt: 'Jan 1, 2026' },
-  { id: 'p5', dealerId: 'dealer-001', name: 'Carbendazim 50%', category: 'Fungicide', price: 380, stock: 90, description: 'Systemic fungicide', sales: 29, createdAt: 'Jan 1, 2026' },
-  { id: 'p6', dealerId: 'dealer-001', name: 'Imidacloprid', category: 'Insecticide', price: 520, stock: 75, description: 'Systemic insecticide', sales: 34, createdAt: 'Jan 1, 2026' },
-  { id: 'p7', dealerId: 'dealer-001', name: 'Potash MOP', category: 'Fertilizer', price: 950, stock: 150, description: 'Muriate of potash', sales: 41, createdAt: 'Jan 1, 2026' },
-  { id: 'p8', dealerId: 'dealer-001', name: 'Micronutrient Mix', category: 'Fertilizer', price: 280, stock: 110, description: 'Essential micronutrients', sales: 63, createdAt: 'Jan 1, 2026' },
+  { id: 'p1', dealerId: 'dealer-001', name: 'Mancozeb 75% WP', category: 'Fungicide', price: 450, stock: 120, description: 'Broad-spectrum fungicide for various crops', sales: 45, createdAt: 'Jan 1, 2026', rating: 4.5, reviews: 28 },
+  { id: 'p2', dealerId: 'dealer-001', name: 'Neem Oil Organic', category: 'Organic', price: 320, stock: 85, description: 'Natural pest control solution', sales: 72, createdAt: 'Jan 1, 2026', rating: 4.8, reviews: 45 },
+  { id: 'p3', dealerId: 'dealer-001', name: 'DAP Fertilizer', category: 'Fertilizer', price: 1200, stock: 200, description: 'Diammonium phosphate for healthy growth', sales: 38, createdAt: 'Jan 1, 2026', rating: 4.3, reviews: 32 },
+  { id: 'p4', dealerId: 'dealer-001', name: 'Urea 46%', category: 'Fertilizer', price: 800, stock: 300, description: 'High nitrogen fertilizer', sales: 56, createdAt: 'Jan 1, 2026', rating: 4.2, reviews: 19 },
+  { id: 'p5', dealerId: 'dealer-001', name: 'Carbendazim 50%', category: 'Fungicide', price: 380, stock: 90, description: 'Systemic fungicide for soil-borne diseases', sales: 29, createdAt: 'Jan 1, 2026', rating: 4.4, reviews: 15 },
+  { id: 'p6', dealerId: 'dealer-001', name: 'Imidacloprid', category: 'Insecticide', price: 520, stock: 75, description: 'Systemic insecticide for sucking pests', sales: 34, createdAt: 'Jan 1, 2026', rating: 4.6, reviews: 22 },
+  { id: 'p7', dealerId: 'dealer-001', name: 'Potash MOP', category: 'Fertilizer', price: 950, stock: 150, description: 'Muriate of potash for fruit quality', sales: 41, createdAt: 'Jan 1, 2026', rating: 4.1, reviews: 12 },
+  { id: 'p8', dealerId: 'dealer-001', name: 'Micronutrient Mix', category: 'Fertilizer', price: 280, stock: 110, description: 'Essential micronutrients blend', sales: 63, createdAt: 'Jan 1, 2026', rating: 4.7, reviews: 38 },
+  { id: 'p9', dealerId: 'd2', name: 'Trichoderma Bio', category: 'Organic', price: 350, stock: 60, description: 'Biological fungicide for root health', sales: 25, createdAt: 'Jan 5, 2026', rating: 4.9, reviews: 41 },
+  { id: 'p10', dealerId: 'd2', name: 'Vermicompost Premium', category: 'Organic', price: 450, stock: 200, description: 'Organic soil enrichment', sales: 88, createdAt: 'Jan 5, 2026', rating: 4.8, reviews: 56 },
 ];
 
 const seedInquiries: Inquiry[] = [
@@ -242,165 +373,206 @@ const seedPlatformUsers: PlatformUser[] = [
   { id: 'admin-001', email: 'admin@kishu.com', name: 'Admin User', role: 'admin', status: 'active', createdAt: 'Dec 1, 2025', lastActive: 'Today', location: 'Mumbai' },
   { id: 'f2', email: 'sunita@email.com', name: 'Sunita Devi', role: 'farmer', status: 'active', createdAt: 'Jan 5, 2026', lastActive: 'Yesterday', location: 'Lucknow, UP' },
   { id: 'f3', email: 'mohan@email.com', name: 'Mohan Singh', role: 'farmer', status: 'active', createdAt: 'Jan 8, 2026', lastActive: '2 days ago', location: 'Bhopal, MP' },
-  { id: 'd2', email: 'greenfarmsupply@email.com', name: 'Green Farm Supplies', role: 'dealer', status: 'pending', createdAt: 'Jan 12, 2026', lastActive: 'Jan 12, 2026', location: 'Pune, MH' },
+  { id: 'd2', email: 'greenfarmsupply@email.com', name: 'Green Farm Supplies', role: 'dealer', status: 'active', createdAt: 'Jan 12, 2026', lastActive: 'Jan 12, 2026', location: 'Pune, MH' },
   { id: 'd3', email: 'agrisolutions@email.com', name: 'Agri Solutions Pvt Ltd', role: 'dealer', status: 'pending', createdAt: 'Jan 14, 2026', lastActive: 'Jan 14, 2026', location: 'Mumbai, MH' },
 ];
 
 // CRM Seed Data
 const seedCustomers: Customer[] = [
-  {
-    id: 'c1',
-    farmerId: 'farmer-001',
-    dealerId: 'dealer-001',
-    farmerName: 'Ramesh Kumar',
-    phone: '+91 9876543210',
-    email: 'ramesh@email.com',
-    location: 'Jaipur, RJ',
-    crops: ['Tomato', 'Wheat', 'Cotton'],
-    firstContact: '2025-12-15',
-    lastContact: '2026-01-15',
-    totalInquiries: 3,
-    totalPurchases: 2,
-    status: 'vip',
-    isFavorite: true,
-  },
-  {
-    id: 'c2',
-    farmerId: 'f2',
-    dealerId: 'dealer-001',
-    farmerName: 'Sunil Yadav',
-    phone: '+91 9876543211',
-    email: 'sunil@email.com',
-    location: 'Lucknow, UP',
-    crops: ['Rice', 'Sugarcane'],
-    firstContact: '2026-01-05',
-    lastContact: '2026-01-16',
-    totalInquiries: 1,
-    totalPurchases: 0,
-    status: 'active',
-    isFavorite: false,
-  },
-  {
-    id: 'c3',
-    farmerId: 'f3',
-    dealerId: 'dealer-001',
-    farmerName: 'Priya Sharma',
-    phone: '+91 9876543212',
-    email: 'priya@email.com',
-    location: 'Ahmedabad, GJ',
-    crops: ['Cotton', 'Groundnut'],
-    firstContact: '2025-11-20',
-    lastContact: '2026-01-10',
-    totalInquiries: 5,
-    totalPurchases: 4,
-    status: 'vip',
-    isFavorite: true,
-  },
-  {
-    id: 'c4',
-    farmerId: 'f4',
-    dealerId: 'dealer-001',
-    farmerName: 'Mohan Singh',
-    phone: '+91 9876543213',
-    email: 'mohan@email.com',
-    location: 'Bhopal, MP',
-    crops: ['Wheat', 'Soybean'],
-    firstContact: '2026-01-08',
-    lastContact: '2026-01-14',
-    totalInquiries: 2,
-    totalPurchases: 1,
-    status: 'active',
-    isFavorite: false,
-  },
-  {
-    id: 'c5',
-    farmerId: 'f5',
-    dealerId: 'dealer-001',
-    farmerName: 'Geeta Devi',
-    phone: '+91 9876543214',
-    email: 'geeta@email.com',
-    location: 'Patna, BR',
-    crops: ['Potato', 'Maize'],
-    firstContact: '2025-12-01',
-    lastContact: '2026-01-12',
-    totalInquiries: 4,
-    totalPurchases: 3,
-    status: 'active',
-    isFavorite: false,
-  },
+  { id: 'c1', farmerId: 'farmer-001', dealerId: 'dealer-001', farmerName: 'Ramesh Kumar', phone: '+91 9876543210', email: 'ramesh@email.com', location: 'Jaipur, RJ', crops: ['Tomato', 'Wheat', 'Cotton'], firstContact: '2025-12-15', lastContact: '2026-01-15', totalInquiries: 3, totalPurchases: 2, status: 'vip', isFavorite: true },
+  { id: 'c2', farmerId: 'f2', dealerId: 'dealer-001', farmerName: 'Sunil Yadav', phone: '+91 9876543211', email: 'sunil@email.com', location: 'Lucknow, UP', crops: ['Rice', 'Sugarcane'], firstContact: '2026-01-05', lastContact: '2026-01-16', totalInquiries: 1, totalPurchases: 0, status: 'active', isFavorite: false },
+  { id: 'c3', farmerId: 'f3', dealerId: 'dealer-001', farmerName: 'Priya Sharma', phone: '+91 9876543212', email: 'priya@email.com', location: 'Ahmedabad, GJ', crops: ['Cotton', 'Groundnut'], firstContact: '2025-11-20', lastContact: '2026-01-10', totalInquiries: 5, totalPurchases: 4, status: 'vip', isFavorite: true },
+  { id: 'c4', farmerId: 'f4', dealerId: 'dealer-001', farmerName: 'Mohan Singh', phone: '+91 9876543213', email: 'mohan@email.com', location: 'Bhopal, MP', crops: ['Wheat', 'Soybean'], firstContact: '2026-01-08', lastContact: '2026-01-14', totalInquiries: 2, totalPurchases: 1, status: 'active', isFavorite: false },
+  { id: 'c5', farmerId: 'f5', dealerId: 'dealer-001', farmerName: 'Geeta Devi', phone: '+91 9876543214', email: 'geeta@email.com', location: 'Patna, BR', crops: ['Potato', 'Maize'], firstContact: '2025-12-01', lastContact: '2026-01-12', totalInquiries: 4, totalPurchases: 3, status: 'active', isFavorite: false },
 ];
 
 const seedCustomerNotes: CustomerNote[] = [
-  {
-    id: 'cn1',
-    customerId: 'c1',
-    dealerId: 'dealer-001',
-    content: 'Prefers organic products. Budget conscious but willing to pay for quality.',
-    createdAt: '2026-01-10T10:00:00Z',
-    type: 'general',
-  },
-  {
-    id: 'cn2',
-    customerId: 'c1',
-    dealerId: 'dealer-001',
-    content: 'Follow up on fungicide effectiveness after 2 weeks.',
-    createdAt: '2026-01-15T14:30:00Z',
-    type: 'followup',
-  },
-  {
-    id: 'cn3',
-    customerId: 'c3',
-    dealerId: 'dealer-001',
-    content: 'Manages 50 acres. Key customer for bulk orders.',
-    createdAt: '2026-01-05T09:00:00Z',
-    type: 'general',
-  },
-  {
-    id: 'cn4',
-    customerId: 'c5',
-    dealerId: 'dealer-001',
-    content: 'Had issue with late blight. Resolved with Mancozeb treatment.',
-    createdAt: '2026-01-12T16:00:00Z',
-    type: 'issue',
-  },
+  { id: 'cn1', customerId: 'c1', dealerId: 'dealer-001', content: 'Prefers organic products. Budget conscious but willing to pay for quality.', createdAt: '2026-01-10T10:00:00Z', type: 'general' },
+  { id: 'cn2', customerId: 'c1', dealerId: 'dealer-001', content: 'Follow up on fungicide effectiveness after 2 weeks.', createdAt: '2026-01-15T14:30:00Z', type: 'followup' },
+  { id: 'cn3', customerId: 'c3', dealerId: 'dealer-001', content: 'Manages 50 acres. Key customer for bulk orders.', createdAt: '2026-01-05T09:00:00Z', type: 'general' },
+  { id: 'cn4', customerId: 'c5', dealerId: 'dealer-001', content: 'Had issue with late blight. Resolved with Mancozeb treatment.', createdAt: '2026-01-12T16:00:00Z', type: 'issue' },
 ];
 
 const seedFollowUpReminders: FollowUpReminder[] = [
+  { id: 'fr1', customerId: 'c1', dealerId: 'dealer-001', customerName: 'Ramesh Kumar', title: 'Check on wheat treatment', description: 'Follow up on the fungicide recommendation for early blight', dueDate: '2026-01-20', completed: false, priority: 'high', createdAt: '2026-01-15T10:00:00Z' },
+  { id: 'fr2', customerId: 'c3', dealerId: 'dealer-001', customerName: 'Priya Sharma', title: 'Bulk order discussion', description: 'Discuss fertilizer requirements for next season', dueDate: '2026-01-22', completed: false, priority: 'medium', createdAt: '2026-01-14T11:00:00Z' },
+  { id: 'fr3', customerId: 'c2', dealerId: 'dealer-001', customerName: 'Sunil Yadav', title: 'Send product catalog', description: 'Share organic product options for rice cultivation', dueDate: '2026-01-19', completed: false, priority: 'low', createdAt: '2026-01-16T08:00:00Z' },
+];
+
+// Seed Reels
+const seedReels: Reel[] = [
   {
-    id: 'fr1',
-    customerId: 'c1',
-    dealerId: 'dealer-001',
-    customerName: 'Ramesh Kumar',
-    title: 'Check on wheat treatment',
-    description: 'Follow up on the fungicide recommendation for early blight',
-    dueDate: '2026-01-20',
-    completed: false,
-    priority: 'high',
-    createdAt: '2026-01-15T10:00:00Z',
+    id: 'reel1',
+    creatorId: 'creator-001',
+    creatorName: 'Kisan Vikas',
+    creatorAvatar: undefined,
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400',
+    caption: 'बेहतर उपज के लिए ड्रिप इरीगेशन 💧',
+    description: 'Learn how drip irrigation can increase your yield by 40% while saving water',
+    tags: ['irrigation', 'water-saving', 'technique'],
+    category: 'technique',
+    likes: ['farmer-001', 'f2', 'f3'],
+    comments: [
+      { id: 'rc1', userId: 'f2', userName: 'Sunita Devi', content: 'Very helpful! 🙏', likes: [], createdAt: new Date().toISOString() }
+    ],
+    shares: 45,
+    views: 1250,
+    duration: 32,
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
   },
   {
-    id: 'fr2',
-    customerId: 'c3',
-    dealerId: 'dealer-001',
-    customerName: 'Priya Sharma',
-    title: 'Bulk order discussion',
-    description: 'Discuss fertilizer requirements for next season',
-    dueDate: '2026-01-22',
-    completed: false,
-    priority: 'medium',
-    createdAt: '2026-01-14T11:00:00Z',
+    id: 'reel2',
+    creatorId: 'creator-002',
+    creatorName: 'Organic Farming India',
+    creatorAvatar: undefined,
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400',
+    caption: 'जैविक खाद बनाने का आसान तरीका 🌱',
+    description: 'Step by step guide to make organic compost at home',
+    tags: ['organic', 'compost', 'sustainable'],
+    category: 'organic',
+    likes: ['farmer-001', 'f3', 'f4', 'f5'],
+    comments: [],
+    shares: 89,
+    views: 3420,
+    duration: 45,
+    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
   },
   {
-    id: 'fr3',
-    customerId: 'c2',
+    id: 'reel3',
+    creatorId: 'creator-001',
+    creatorName: 'Kisan Vikas',
+    creatorAvatar: undefined,
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400',
+    caption: 'टमाटर में कीट नियंत्रण के घरेलू उपाय 🍅',
+    description: 'Natural pest control methods for tomato crops',
+    tags: ['tomato', 'pest-control', 'tips'],
+    category: 'tips',
+    likes: ['f2', 'f4'],
+    comments: [
+      { id: 'rc2', userId: 'farmer-001', userName: 'Ramesh Kumar', content: 'This worked great on my farm!', likes: ['f2'], createdAt: new Date().toISOString() }
+    ],
+    shares: 23,
+    views: 890,
+    duration: 28,
+    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'reel4',
+    creatorId: 'creator-003',
+    creatorName: 'Modern Kheti',
+    creatorAvatar: undefined,
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=400',
+    caption: 'मेरी गेहूं की बम्पर फसल का राज़ 🌾',
+    description: 'How I achieved record wheat harvest this season',
+    tags: ['wheat', 'harvest', 'success'],
+    category: 'success-story',
+    likes: ['farmer-001', 'f2', 'f3', 'f4', 'f5'],
+    comments: [],
+    shares: 156,
+    views: 5670,
+    duration: 52,
+    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  },
+  {
+    id: 'reel5',
+    creatorId: 'creator-002',
+    creatorName: 'Organic Farming India',
+    creatorAvatar: undefined,
+    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400',
+    caption: 'ट्रैक्टर मेंटेनेंस टिप्स 🚜',
+    description: 'Essential tractor maintenance tips every farmer should know',
+    tags: ['tractor', 'equipment', 'maintenance'],
+    category: 'equipment',
+    likes: ['f3', 'f4'],
+    comments: [],
+    shares: 34,
+    views: 1890,
+    duration: 38,
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString()
+  },
+];
+
+// Seed Creator Profiles
+const seedCreatorProfiles: CreatorProfile[] = [
+  {
+    userId: 'creator-001',
+    isCreator: true,
+    bio: 'Sharing modern farming techniques | 10+ years experience | Punjab 🌾',
+    coverImage: undefined,
+    totalFollowers: 2450,
+    totalLikes: 8900,
+    totalViews: 45000,
+    reelIds: ['reel1', 'reel3'],
+    createdAt: '2025-06-15T10:00:00Z'
+  },
+  {
+    userId: 'creator-002',
+    isCreator: true,
+    bio: 'Organic farming advocate | Sustainable agriculture | Maharashtra 🌱',
+    coverImage: undefined,
+    totalFollowers: 5680,
+    totalLikes: 23400,
+    totalViews: 98000,
+    reelIds: ['reel2', 'reel5'],
+    createdAt: '2025-03-20T10:00:00Z'
+  },
+  {
+    userId: 'creator-003',
+    isCreator: true,
+    bio: 'Progressive farmer | Tech in agriculture | Haryana 🚜',
+    coverImage: undefined,
+    totalFollowers: 8920,
+    totalLikes: 45600,
+    totalViews: 156000,
+    reelIds: ['reel4'],
+    createdAt: '2024-11-10T10:00:00Z'
+  },
+];
+
+// Seed Subscriptions
+const seedSubscriptions: Subscription[] = [
+  { id: 'sub1', subscriberId: 'farmer-001', creatorId: 'creator-001', createdAt: '2026-01-10T10:00:00Z' },
+  { id: 'sub2', subscriberId: 'farmer-001', creatorId: 'creator-002', createdAt: '2026-01-12T10:00:00Z' },
+  { id: 'sub3', subscriberId: 'f2', creatorId: 'creator-001', createdAt: '2026-01-08T10:00:00Z' },
+];
+
+// Seed Orders
+const seedOrders: Order[] = [
+  {
+    id: 'ord1',
+    farmerId: 'farmer-001',
     dealerId: 'dealer-001',
-    customerName: 'Sunil Yadav',
-    title: 'Send product catalog',
-    description: 'Share organic product options for rice cultivation',
-    dueDate: '2026-01-19',
-    completed: false,
-    priority: 'low',
-    createdAt: '2026-01-16T08:00:00Z',
+    dealerName: 'Sunil Agro Supplies',
+    items: [
+      { productId: 'p1', productName: 'Mancozeb 75% WP', quantity: 2, price: 450 },
+      { productId: 'p2', productName: 'Neem Oil Organic', quantity: 1, price: 320 }
+    ],
+    totalAmount: 1220,
+    status: 'delivered',
+    paymentMethod: 'cod',
+    shippingAddress: 'Village Rampur, Jaipur, Rajasthan',
+    createdAt: '2026-01-10T10:00:00Z',
+    updatedAt: '2026-01-14T15:00:00Z'
+  },
+  {
+    id: 'ord2',
+    farmerId: 'farmer-001',
+    dealerId: 'dealer-001',
+    dealerName: 'Sunil Agro Supplies',
+    items: [
+      { productId: 'p3', productName: 'DAP Fertilizer', quantity: 3, price: 1200 }
+    ],
+    totalAmount: 3600,
+    status: 'shipped',
+    paymentMethod: 'upi',
+    shippingAddress: 'Village Rampur, Jaipur, Rajasthan',
+    createdAt: '2026-01-18T10:00:00Z',
+    updatedAt: '2026-01-19T12:00:00Z'
   },
 ];
 
@@ -414,6 +586,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [customers, setCustomers] = useLocalStorage<Customer[]>('kishu-customers', seedCustomers);
   const [customerNotes, setCustomerNotes] = useLocalStorage<CustomerNote[]>('kishu-customer-notes', seedCustomerNotes);
   const [followUpReminders, setFollowUpReminders] = useLocalStorage<FollowUpReminder[]>('kishu-followups', seedFollowUpReminders);
+  const [cart, setCart] = useLocalStorage<CartItem[]>('kishu-cart', []);
+  const [orders, setOrders] = useLocalStorage<Order[]>('kishu-orders', seedOrders);
+  const [reels, setReels] = useLocalStorage<Reel[]>('kishu-reels', seedReels);
+  const [subscriptions, setSubscriptions] = useLocalStorage<Subscription[]>('kishu-subscriptions', seedSubscriptions);
+  const [creatorProfiles, setCreatorProfiles] = useLocalStorage<CreatorProfile[]>('kishu-creators', seedCreatorProfiles);
+  const [savedReels, setSavedReels] = useLocalStorage<string[]>('kishu-saved-reels', []);
 
   // Diagnoses
   const addDiagnosis = useCallback((diagnosis: Omit<Diagnosis, 'id' | 'date'>): Diagnosis => {
@@ -620,6 +798,241 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return followUpReminders.filter(r => r.dealerId === dealerId && !r.completed).length;
   }, [followUpReminders]);
 
+  // Shopping Cart
+  const addToCart = useCallback((item: CartItem) => {
+    setCart(prev => {
+      const existing = prev.find(i => i.productId === item.productId);
+      if (existing) {
+        return prev.map(i => 
+          i.productId === item.productId 
+            ? { ...i, quantity: i.quantity + item.quantity }
+            : i
+        );
+      }
+      return [...prev, item];
+    });
+  }, [setCart]);
+
+  const updateCartQuantity = useCallback((productId: string, quantity: number) => {
+    if (quantity <= 0) {
+      setCart(prev => prev.filter(i => i.productId !== productId));
+    } else {
+      setCart(prev => prev.map(i => 
+        i.productId === productId ? { ...i, quantity } : i
+      ));
+    }
+  }, [setCart]);
+
+  const removeFromCart = useCallback((productId: string) => {
+    setCart(prev => prev.filter(i => i.productId !== productId));
+  }, [setCart]);
+
+  const clearCart = useCallback(() => {
+    setCart([]);
+  }, [setCart]);
+
+  const getCartTotal = useCallback(() => {
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }, [cart]);
+
+  const getCartItemCount = useCallback(() => {
+    return cart.reduce((sum, item) => sum + item.quantity, 0);
+  }, [cart]);
+
+  // Orders
+  const placeOrder = useCallback((order: Omit<Order, 'id' | 'createdAt' | 'updatedAt'>): Order => {
+    const now = new Date().toISOString();
+    const newOrder: Order = {
+      ...order,
+      id: `ord${Date.now()}`,
+      createdAt: now,
+      updatedAt: now,
+    };
+    setOrders(prev => [newOrder, ...prev]);
+    return newOrder;
+  }, [setOrders]);
+
+  const updateOrderStatus = useCallback((orderId: string, status: Order['status']) => {
+    setOrders(prev => prev.map(o => 
+      o.id === orderId ? { ...o, status, updatedAt: new Date().toISOString() } : o
+    ));
+  }, [setOrders]);
+
+  const getOrdersByFarmer = useCallback((farmerId: string) => {
+    return orders.filter(o => o.farmerId === farmerId);
+  }, [orders]);
+
+  const getOrdersByDealer = useCallback((dealerId: string) => {
+    return orders.filter(o => o.dealerId === dealerId);
+  }, [orders]);
+
+  // Reels
+  const addReel = useCallback((reel: Omit<Reel, 'id' | 'likes' | 'comments' | 'shares' | 'views' | 'createdAt'>): Reel => {
+    const newReel: Reel = {
+      ...reel,
+      id: `reel${Date.now()}`,
+      likes: [],
+      comments: [],
+      shares: 0,
+      views: 0,
+      createdAt: new Date().toISOString(),
+    };
+    setReels(prev => [newReel, ...prev]);
+    
+    // Update creator profile
+    setCreatorProfiles(prev => prev.map(p => 
+      p.userId === reel.creatorId 
+        ? { ...p, reelIds: [newReel.id, ...p.reelIds] }
+        : p
+    ));
+    
+    return newReel;
+  }, [setReels, setCreatorProfiles]);
+
+  const updateReel = useCallback((id: string, data: Partial<Reel>) => {
+    setReels(prev => prev.map(r => r.id === id ? { ...r, ...data } : r));
+  }, [setReels]);
+
+  const deleteReel = useCallback((id: string) => {
+    const reel = reels.find(r => r.id === id);
+    setReels(prev => prev.filter(r => r.id !== id));
+    
+    if (reel) {
+      setCreatorProfiles(prev => prev.map(p => 
+        p.userId === reel.creatorId 
+          ? { ...p, reelIds: p.reelIds.filter(rid => rid !== id) }
+          : p
+      ));
+    }
+  }, [reels, setReels, setCreatorProfiles]);
+
+  const toggleReelLike = useCallback((reelId: string, userId: string) => {
+    setReels(prev => prev.map(r => {
+      if (r.id !== reelId) return r;
+      const likes = r.likes.includes(userId) 
+        ? r.likes.filter(id => id !== userId)
+        : [...r.likes, userId];
+      return { ...r, likes };
+    }));
+  }, [setReels]);
+
+  const addReelComment = useCallback((reelId: string, comment: Omit<ReelComment, 'id' | 'likes' | 'createdAt'>) => {
+    const newComment: ReelComment = {
+      ...comment,
+      id: `rc${Date.now()}`,
+      likes: [],
+      createdAt: new Date().toISOString(),
+    };
+    setReels(prev => prev.map(r => 
+      r.id === reelId ? { ...r, comments: [...r.comments, newComment] } : r
+    ));
+  }, [setReels]);
+
+  const incrementReelViews = useCallback((reelId: string) => {
+    setReels(prev => prev.map(r => 
+      r.id === reelId ? { ...r, views: r.views + 1 } : r
+    ));
+  }, [setReels]);
+
+  const incrementReelShares = useCallback((reelId: string) => {
+    setReels(prev => prev.map(r => 
+      r.id === reelId ? { ...r, shares: r.shares + 1 } : r
+    ));
+  }, [setReels]);
+
+  const getReelsByCreator = useCallback((creatorId: string) => {
+    return reels.filter(r => r.creatorId === creatorId);
+  }, [reels]);
+
+  // Subscriptions
+  const subscribe = useCallback((creatorId: string, subscriberId: string) => {
+    const exists = subscriptions.find(s => s.creatorId === creatorId && s.subscriberId === subscriberId);
+    if (!exists) {
+      const newSub: Subscription = {
+        id: `sub${Date.now()}`,
+        subscriberId,
+        creatorId,
+        createdAt: new Date().toISOString(),
+      };
+      setSubscriptions(prev => [...prev, newSub]);
+      
+      setCreatorProfiles(prev => prev.map(p => 
+        p.userId === creatorId 
+          ? { ...p, totalFollowers: p.totalFollowers + 1 }
+          : p
+      ));
+    }
+  }, [subscriptions, setSubscriptions, setCreatorProfiles]);
+
+  const unsubscribe = useCallback((creatorId: string, subscriberId: string) => {
+    setSubscriptions(prev => prev.filter(s => 
+      !(s.creatorId === creatorId && s.subscriberId === subscriberId)
+    ));
+    
+    setCreatorProfiles(prev => prev.map(p => 
+      p.userId === creatorId 
+        ? { ...p, totalFollowers: Math.max(0, p.totalFollowers - 1) }
+        : p
+    ));
+  }, [setSubscriptions, setCreatorProfiles]);
+
+  const isSubscribed = useCallback((creatorId: string, subscriberId: string) => {
+    return subscriptions.some(s => s.creatorId === creatorId && s.subscriberId === subscriberId);
+  }, [subscriptions]);
+
+  const getSubscriberCount = useCallback((creatorId: string) => {
+    return subscriptions.filter(s => s.creatorId === creatorId).length;
+  }, [subscriptions]);
+
+  const getSubscribedCreators = useCallback((subscriberId: string) => {
+    return subscriptions.filter(s => s.subscriberId === subscriberId).map(s => s.creatorId);
+  }, [subscriptions]);
+
+  // Creator Profiles
+  const becomeCreator = useCallback((userId: string, bio: string) => {
+    const exists = creatorProfiles.find(p => p.userId === userId);
+    if (!exists) {
+      const newProfile: CreatorProfile = {
+        userId,
+        isCreator: true,
+        bio,
+        totalFollowers: 0,
+        totalLikes: 0,
+        totalViews: 0,
+        reelIds: [],
+        createdAt: new Date().toISOString(),
+      };
+      setCreatorProfiles(prev => [...prev, newProfile]);
+    }
+  }, [creatorProfiles, setCreatorProfiles]);
+
+  const updateCreatorProfile = useCallback((userId: string, data: Partial<CreatorProfile>) => {
+    setCreatorProfiles(prev => prev.map(p => 
+      p.userId === userId ? { ...p, ...data } : p
+    ));
+  }, [setCreatorProfiles]);
+
+  const getCreatorProfile = useCallback((userId: string) => {
+    return creatorProfiles.find(p => p.userId === userId);
+  }, [creatorProfiles]);
+
+  const isCreator = useCallback((userId: string) => {
+    return creatorProfiles.some(p => p.userId === userId && p.isCreator);
+  }, [creatorProfiles]);
+
+  // Saved Reels
+  const toggleSaveReel = useCallback((reelId: string) => {
+    setSavedReels(prev => 
+      prev.includes(reelId) 
+        ? prev.filter(id => id !== reelId)
+        : [...prev, reelId]
+    );
+  }, [setSavedReels]);
+
+  const isSavedReel = useCallback((reelId: string) => {
+    return savedReels.includes(reelId);
+  }, [savedReels]);
+
   return (
     <DataContext.Provider value={{
       diagnoses, addDiagnosis, deleteDiagnosis, toggleBookmark,
@@ -631,6 +1044,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       customers, addCustomer, updateCustomer, toggleFavoriteCustomer, getCustomerById,
       customerNotes, addCustomerNote, deleteCustomerNote, getNotesForCustomer,
       followUpReminders, addFollowUpReminder, completeFollowUp, deleteFollowUp, getRemindersForDealer, getPendingRemindersCount,
+      cart, addToCart, updateCartQuantity, removeFromCart, clearCart, getCartTotal, getCartItemCount,
+      orders, placeOrder, updateOrderStatus, getOrdersByFarmer, getOrdersByDealer,
+      reels, addReel, updateReel, deleteReel, toggleReelLike, addReelComment, incrementReelViews, incrementReelShares, getReelsByCreator,
+      subscriptions, subscribe, unsubscribe, isSubscribed, getSubscriberCount, getSubscribedCreators,
+      creatorProfiles, becomeCreator, updateCreatorProfile, getCreatorProfile, isCreator,
+      savedReels, toggleSaveReel, isSavedReel,
     }}>
       {children}
     </DataContext.Provider>
