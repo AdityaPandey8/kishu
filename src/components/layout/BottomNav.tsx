@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Camera, History, User, Users, Package, MessageSquare, TrendingUp } from 'lucide-react';
+import { Home, Camera, User, Users, Package, MessageSquare, TrendingUp, ShoppingBag, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -11,12 +11,12 @@ export const BottomNav = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Farmer navigation items
+  // Farmer navigation items - updated with Shop and Reels
   const farmerNavItems = [
     { key: 'home', icon: Home, path: '/', label: t('nav.home') },
-    { key: 'scan', icon: Camera, path: '/scan', label: t('nav.scan') },
+    { key: 'shop', icon: ShoppingBag, path: '/shop', label: 'Shop' },
+    { key: 'reels', icon: Play, path: '/reels', label: 'Reels' },
     { key: 'community', icon: Users, path: '/community', label: 'Community' },
-    { key: 'history', icon: History, path: '/history', label: t('nav.history') },
     { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
   ];
 
