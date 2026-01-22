@@ -32,6 +32,17 @@ import DealerAnalytics from "./pages/DealerAnalytics";
 import QuoteBuilder from "./pages/QuoteBuilder";
 import Customers from "./pages/Customers";
 import CustomerDetail from "./pages/CustomerDetail";
+import Shop from "./pages/Shop";
+import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import MyOrders from "./pages/MyOrders";
+import Reels from "./pages/Reels";
+import ReelSearch from "./pages/ReelSearch";
+import CreatorProfile from "./pages/CreatorProfile";
+import BecomeCreator from "./pages/BecomeCreator";
+import CreatorStudio from "./pages/CreatorStudio";
+import UploadReel from "./pages/UploadReel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,6 +81,17 @@ const App = () => (
                 <Route path="/quotes/new" element={<QuoteBuilder />} />
                 <Route path="/customers" element={<Customers />} />
                 <Route path="/customers/:id" element={<CustomerDetail />} />
+                <Route path="/shop" element={<Shop />} />
+                <Route path="/shop/:productId" element={<ProductDetail />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/orders" element={<MyOrders />} />
+                <Route path="/reels" element={<Reels />} />
+                <Route path="/reels/search" element={<ReelSearch />} />
+                <Route path="/creator/:id" element={<CreatorProfile />} />
+                <Route path="/become-creator" element={<BecomeCreator />} />
+                <Route path="/creator-studio" element={<CreatorStudio />} />
+                <Route path="/creator-studio/upload" element={<UploadReel />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

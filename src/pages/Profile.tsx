@@ -5,11 +5,12 @@ import { motion } from 'framer-motion';
 import { 
   User, MapPin, Wheat, Globe, Bell, ChevronRight, LogOut, 
   Settings, Shield, Camera, Edit2, Phone, Mail, Ruler, Clock,
-  Award, Leaf, TrendingUp
+  Award, Leaf, TrendingUp, Video, ShoppingBag, Package, Play
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useData } from '@/contexts/DataContext';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -17,7 +18,12 @@ const Profile = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { getCreatorProfile, orders } = useData();
   const isHindi = i18n.language === 'hi';
+  
+  const creatorProfile = user ? getCreatorProfile(user.id) : undefined;
+  const isCreator = creatorProfile?.isCreator || false;
+  const userOrders = orders.filter(o => o.farmerId === user?.id);
 
   const handleLogout = () => {
     logout();
@@ -196,11 +202,95 @@ const Profile = () => {
           </div>
         </motion.div>
 
+        {/* Creator Section */}
+        {user?.role === 'farmer' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+          >
+            {isCreator ? (
+              <div className="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                      <Video className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">
+                        {isHindi ? 'क्रिएटर स्टूडियो' : 'Creator Studio'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {isHindi ? 'अपने वीडियो प्रबंधित करें' : 'Manage your videos'}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => navigate('/creator-studio')}
+                    className="rounded-xl gradient-kishu"
+                  >
+                    <Play className="h-4 w-4 mr-1" />
+                    {isHindi ? 'खोलें' : 'Open'}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-card border border-border rounded-2xl p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+                    <Video className="h-6 w-6 text-primary-foreground" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-foreground">
+                      {isHindi ? 'क्रिएटर बनें' : 'Become a Creator'}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {isHindi ? 'अपने ज्ञान को साझा करें और किसानों की मदद करें' : 'Share your knowledge and help farmers'}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => navigate('/become-creator')}
+                  className="w-full rounded-xl gradient-kishu shadow-kishu"
+                >
+                  {isHindi ? 'शुरू करें' : 'Get Started'}
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* My Orders Section */}
+        {user?.role === 'farmer' && userOrders.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <Button
+              variant="outline"
+              className="w-full h-12 rounded-xl justify-between"
+              onClick={() => navigate('/orders')}
+            >
+              <div className="flex items-center gap-3">
+                <Package className="h-5 w-5 text-primary" />
+                {isHindi ? 'मेरे ऑर्डर' : 'My Orders'}
+                <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                  {userOrders.length}
+                </span>
+              </div>
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </motion.div>
+        )}
+
         {/* Quick Actions */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
+          transition={{ delay: 0.35 }}
           className="space-y-3"
         >
           <Button 
