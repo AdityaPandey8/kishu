@@ -1,6 +1,12 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export type UserRole = 'farmer' | 'dealer' | 'admin';
+export type KYCStatus = 'not_submitted' | 'pending' | 'approved' | 'rejected';
+
+export interface UserCoordinates {
+  lat: number;
+  lng: number;
+}
 
 export interface User {
   id: string;
@@ -13,6 +19,18 @@ export interface User {
   avatar?: string;
   farmSize?: string;
   experience?: string;
+  // Location fields
+  coordinates?: UserCoordinates;
+  manualLocation?: boolean;
+  locationUpdatedAt?: string;
+  // Expert fields
+  isExpert?: boolean;
+  expertStatus?: 'pending' | 'approved' | 'rejected';
+  // Dealer KYC fields
+  kycStatus?: KYCStatus;
+  kycSubmittedAt?: string;
+  kycApprovedAt?: string;
+  kycRejectionReason?: string;
 }
 
 interface AuthContextType {
@@ -22,6 +40,7 @@ interface AuthContextType {
   signup: (data: SignupData) => Promise<void>;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
+  updateLocation: (coordinates: UserCoordinates, manualLocation?: boolean) => void;
 }
 
 interface SignupData {
@@ -54,6 +73,8 @@ const DEMO_ACCOUNTS: Record<string, User> = {
     crops: ['Wheat', 'Rice', 'Tomato', 'Cotton'],
     farmSize: '5 Acres',
     experience: '12 years',
+    coordinates: { lat: 26.9124, lng: 75.7873 },
+    locationUpdatedAt: new Date().toISOString(),
   },
   'dealer@kishu.com': {
     id: 'dealer-001',
@@ -62,6 +83,8 @@ const DEMO_ACCOUNTS: Record<string, User> = {
     role: 'dealer',
     phone: '+91 87654 32109',
     location: 'Delhi, India',
+    kycStatus: 'approved', // Pre-approved for demo
+    kycApprovedAt: '2025-12-01T10:00:00Z',
   },
   'admin@kishu.com': {
     id: 'admin-001',
@@ -109,6 +132,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       role,
       location: 'India',
       crops: ['Wheat', 'Rice'],
+      // New dealers need KYC
+      ...(role === 'dealer' && { kycStatus: 'not_submitted' as KYCStatus }),
     };
     
     setUser(mockUser);
@@ -125,6 +150,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       role: data.role,
       phone: data.phone,
       location: 'India',
+      // Dealers start with not_submitted KYC status
+      ...(data.role === 'dealer' && { kycStatus: 'not_submitted' as KYCStatus }),
     };
     
     setUser(newUser);
@@ -144,8 +171,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateLocation = (coordinates: UserCoordinates, manualLocation = false) => {
+    if (user) {
+      const updated = {
+        ...user,
+        coordinates,
+        manualLocation,
+        locationUpdatedAt: new Date().toISOString(),
+      };
+      setUser(updated);
+      localStorage.setItem('kishu-user', JSON.stringify(updated));
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, updateUser }}>
+    <AuthContext.Provider value={{ user, isLoading, login, signup, logout, updateUser, updateLocation }}>
       {children}
     </AuthContext.Provider>
   );

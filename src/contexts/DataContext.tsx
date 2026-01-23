@@ -81,6 +81,62 @@ export interface CreatorProfile {
   createdAt: string;
 }
 
+// Market Prices Types
+export interface TrackedCrop {
+  id: string;
+  cropId: string;
+  cropName: string;
+  userId: string;
+  alertEnabled: boolean;
+  alertThreshold?: number;
+  createdAt: string;
+}
+
+// Expert Types
+export interface ExpertApplication {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  specialization: string[];
+  experience: string;
+  certifications: string;
+  bio: string;
+  status: 'pending' | 'approved' | 'rejected';
+  appliedAt: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  rejectionReason?: string;
+}
+
+// Dealer KYC Types
+export interface DealerKYC {
+  id: string;
+  dealerId: string;
+  dealerName: string;
+  dealerEmail: string;
+  businessName: string;
+  businessType: 'retail' | 'wholesale' | 'manufacturer' | 'distributor';
+  gstNumber: string;
+  panNumber: string;
+  businessAddress: string;
+  city: string;
+  state: string;
+  pincode: string;
+  contactNumber: string;
+  bankDetails: {
+    accountName: string;
+    accountNumber: string;
+    ifscCode: string;
+    bankName: string;
+  };
+  status: 'pending' | 'approved' | 'rejected';
+  submittedAt: string;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  rejectionReason?: string;
+}
+
 // Types
 export interface Diagnosis {
   id: string;
@@ -312,6 +368,26 @@ interface DataContextType {
   savedReels: string[];
   toggleSaveReel: (reelId: string) => void;
   isSavedReel: (reelId: string) => boolean;
+
+  // Tracked Crops (Market Prices)
+  trackedCrops: TrackedCrop[];
+  trackCrop: (crop: Omit<TrackedCrop, 'id' | 'createdAt'>) => void;
+  untrackCrop: (cropId: string) => void;
+  isTrackedCrop: (cropId: string) => boolean;
+
+  // Expert Applications
+  expertApplications: ExpertApplication[];
+  applyForExpert: (application: Omit<ExpertApplication, 'id' | 'status' | 'appliedAt'>) => void;
+  approveExpert: (applicationId: string, adminId: string) => void;
+  rejectExpert: (applicationId: string, adminId: string, reason: string) => void;
+  getExpertApplication: (userId: string) => ExpertApplication | undefined;
+
+  // Dealer KYC
+  dealerKYCs: DealerKYC[];
+  submitDealerKYC: (kyc: Omit<DealerKYC, 'id' | 'status' | 'submittedAt'>) => void;
+  approveDealerKYC: (kycId: string, dealerId: string, adminId: string) => void;
+  rejectDealerKYC: (kycId: string, dealerId: string, adminId: string, reason: string) => void;
+  getDealerKYC: (dealerId: string) => DealerKYC | undefined;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -576,6 +652,61 @@ const seedOrders: Order[] = [
   },
 ];
 
+// Seed Expert Applications
+const seedExpertApplications: ExpertApplication[] = [
+  {
+    id: 'exp1',
+    userId: 'f2',
+    userName: 'Sunita Devi',
+    userEmail: 'sunita@email.com',
+    specialization: ['Rice', 'Organic Farming'],
+    experience: '8 years',
+    certifications: 'Organic Farming Certificate',
+    bio: 'Experienced organic farmer from Lucknow with expertise in rice cultivation.',
+    status: 'pending',
+    appliedAt: '2026-01-18T10:00:00Z',
+  },
+  {
+    id: 'exp2',
+    userId: 'f3',
+    userName: 'Mohan Singh',
+    userEmail: 'mohan@email.com',
+    specialization: ['Wheat', 'Soybean'],
+    experience: '15 years',
+    certifications: 'Agricultural Science Diploma',
+    bio: 'Progressive farmer from Bhopal specializing in wheat and soybean cultivation.',
+    status: 'pending',
+    appliedAt: '2026-01-19T14:00:00Z',
+  },
+];
+
+// Seed Dealer KYCs
+const seedDealerKYCs: DealerKYC[] = [
+  {
+    id: 'kyc1',
+    dealerId: 'd3',
+    dealerName: 'Agri Solutions Pvt Ltd',
+    dealerEmail: 'agrisolutions@email.com',
+    businessName: 'Agri Solutions Pvt Ltd',
+    businessType: 'distributor',
+    gstNumber: '27AABCA1234A1Z5',
+    panNumber: 'AABCA1234A',
+    businessAddress: 'Shop 45, Market Road',
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    pincode: '400001',
+    contactNumber: '+91 98765 00001',
+    bankDetails: {
+      accountName: 'Agri Solutions Pvt Ltd',
+      accountNumber: '1234567890123',
+      ifscCode: 'SBIN0001234',
+      bankName: 'State Bank of India',
+    },
+    status: 'pending',
+    submittedAt: '2026-01-14T10:00:00Z',
+  },
+];
+
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [diagnoses, setDiagnoses] = useLocalStorage<Diagnosis[]>('kishu-diagnoses', seedDiagnoses);
   const [products, setProducts] = useLocalStorage<Product[]>('kishu-products', seedProducts);
@@ -592,6 +723,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [subscriptions, setSubscriptions] = useLocalStorage<Subscription[]>('kishu-subscriptions', seedSubscriptions);
   const [creatorProfiles, setCreatorProfiles] = useLocalStorage<CreatorProfile[]>('kishu-creators', seedCreatorProfiles);
   const [savedReels, setSavedReels] = useLocalStorage<string[]>('kishu-saved-reels', []);
+  const [trackedCrops, setTrackedCrops] = useLocalStorage<TrackedCrop[]>('kishu-tracked-crops', []);
+  const [expertApplications, setExpertApplications] = useLocalStorage<ExpertApplication[]>('kishu-expert-applications', seedExpertApplications);
+  const [dealerKYCs, setDealerKYCs] = useLocalStorage<DealerKYC[]>('kishu-dealer-kycs', seedDealerKYCs);
+
 
   // Diagnoses
   const addDiagnosis = useCallback((diagnosis: Omit<Diagnosis, 'id' | 'date'>): Diagnosis => {
@@ -1033,6 +1168,90 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return savedReels.includes(reelId);
   }, [savedReels]);
 
+  // Tracked Crops
+  const trackCrop = useCallback((crop: Omit<TrackedCrop, 'id' | 'createdAt'>) => {
+    const newCrop: TrackedCrop = {
+      ...crop,
+      id: `tc${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    setTrackedCrops(prev => [...prev, newCrop]);
+  }, [setTrackedCrops]);
+
+  const untrackCrop = useCallback((cropId: string) => {
+    setTrackedCrops(prev => prev.filter(c => c.cropId !== cropId));
+  }, [setTrackedCrops]);
+
+  const isTrackedCrop = useCallback((cropId: string) => {
+    return trackedCrops.some(c => c.cropId === cropId);
+  }, [trackedCrops]);
+
+  // Expert Applications
+  const applyForExpert = useCallback((application: Omit<ExpertApplication, 'id' | 'status' | 'appliedAt'>) => {
+    const newApp: ExpertApplication = {
+      ...application,
+      id: `exp${Date.now()}`,
+      status: 'pending',
+      appliedAt: new Date().toISOString(),
+    };
+    setExpertApplications(prev => [...prev, newApp]);
+  }, [setExpertApplications]);
+
+  const approveExpert = useCallback((applicationId: string, adminId: string) => {
+    setExpertApplications(prev => prev.map(app => 
+      app.id === applicationId 
+        ? { ...app, status: 'approved' as const, reviewedAt: new Date().toISOString(), reviewedBy: adminId }
+        : app
+    ));
+  }, [setExpertApplications]);
+
+  const rejectExpert = useCallback((applicationId: string, adminId: string, reason: string) => {
+    setExpertApplications(prev => prev.map(app => 
+      app.id === applicationId 
+        ? { ...app, status: 'rejected' as const, reviewedAt: new Date().toISOString(), reviewedBy: adminId, rejectionReason: reason }
+        : app
+    ));
+  }, [setExpertApplications]);
+
+  const getExpertApplication = useCallback((userId: string) => {
+    return expertApplications.find(app => app.userId === userId);
+  }, [expertApplications]);
+
+  // Dealer KYC
+  const submitDealerKYC = useCallback((kyc: Omit<DealerKYC, 'id' | 'status' | 'submittedAt'>) => {
+    const newKYC: DealerKYC = {
+      ...kyc,
+      id: `kyc${Date.now()}`,
+      status: 'pending',
+      submittedAt: new Date().toISOString(),
+    };
+    setDealerKYCs(prev => [...prev, newKYC]);
+  }, [setDealerKYCs]);
+
+  const approveDealerKYC = useCallback((kycId: string, dealerId: string, adminId: string) => {
+    setDealerKYCs(prev => prev.map(kyc => 
+      kyc.id === kycId 
+        ? { ...kyc, status: 'approved' as const, reviewedAt: new Date().toISOString(), reviewedBy: adminId }
+        : kyc
+    ));
+    // Update the dealer's KYC status in platform users as well
+    setPlatformUsers(prev => prev.map(u => 
+      u.id === dealerId ? { ...u, status: 'active' as const } : u
+    ));
+  }, [setDealerKYCs, setPlatformUsers]);
+
+  const rejectDealerKYC = useCallback((kycId: string, dealerId: string, adminId: string, reason: string) => {
+    setDealerKYCs(prev => prev.map(kyc => 
+      kyc.id === kycId 
+        ? { ...kyc, status: 'rejected' as const, reviewedAt: new Date().toISOString(), reviewedBy: adminId, rejectionReason: reason }
+        : kyc
+    ));
+  }, [setDealerKYCs]);
+
+  const getDealerKYC = useCallback((dealerId: string) => {
+    return dealerKYCs.find(kyc => kyc.dealerId === dealerId);
+  }, [dealerKYCs]);
+
   return (
     <DataContext.Provider value={{
       diagnoses, addDiagnosis, deleteDiagnosis, toggleBookmark,
@@ -1050,6 +1269,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       subscriptions, subscribe, unsubscribe, isSubscribed, getSubscriberCount, getSubscribedCreators,
       creatorProfiles, becomeCreator, updateCreatorProfile, getCreatorProfile, isCreator,
       savedReels, toggleSaveReel, isSavedReel,
+      trackedCrops, trackCrop, untrackCrop, isTrackedCrop,
+      expertApplications, applyForExpert, approveExpert, rejectExpert, getExpertApplication,
+      dealerKYCs, submitDealerKYC, approveDealerKYC, rejectDealerKYC, getDealerKYC,
     }}>
       {children}
     </DataContext.Provider>

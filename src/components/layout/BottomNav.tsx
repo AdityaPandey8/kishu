@@ -33,8 +33,8 @@ export const BottomNav = () => {
   const adminNavItems = [
     { key: 'home', icon: Home, path: '/', label: 'Dashboard' },
     { key: 'users', icon: Users, path: '/users', label: 'Users' },
-    { key: 'community', icon: MessageSquare, path: '/community', label: 'Community' },
-    { key: 'analytics', icon: TrendingUp, path: '/analytics', label: 'Analytics' },
+    { key: 'kyc', icon: Package, path: '/admin/kyc', label: 'KYC' },
+    { key: 'experts', icon: TrendingUp, path: '/admin/experts', label: 'Experts' },
     { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
   ];
 

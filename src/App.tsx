@@ -43,6 +43,15 @@ import CreatorProfile from "./pages/CreatorProfile";
 import BecomeCreator from "./pages/BecomeCreator";
 import CreatorStudio from "./pages/CreatorStudio";
 import UploadReel from "./pages/UploadReel";
+import LocationSettings from "./pages/LocationSettings";
+import MarketPricesPage from "./pages/MarketPricesPage";
+import BecomeExpert from "./pages/BecomeExpert";
+import ExpertDashboard from "./pages/ExpertDashboard";
+import AdminExperts from "./pages/admin/AdminExperts";
+import AdminKYC from "./pages/admin/AdminKYC";
+import DealerKYC from "./pages/dealer/DealerKYC";
+import KYCPending from "./pages/dealer/KYCPending";
+import KYCRejected from "./pages/dealer/KYCRejected";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -92,6 +101,15 @@ const App = () => (
                 <Route path="/become-creator" element={<BecomeCreator />} />
                 <Route path="/creator-studio" element={<CreatorStudio />} />
                 <Route path="/creator-studio/upload" element={<UploadReel />} />
+                <Route path="/settings/location" element={<LocationSettings />} />
+                <Route path="/market-prices" element={<MarketPricesPage />} />
+                <Route path="/become-expert" element={<BecomeExpert />} />
+                <Route path="/expert-dashboard" element={<ExpertDashboard />} />
+                <Route path="/admin/experts" element={<AdminExperts />} />
+                <Route path="/admin/kyc" element={<AdminKYC />} />
+                <Route path="/dealer/kyc" element={<DealerKYC />} />
+                <Route path="/dealer/kyc-pending" element={<KYCPending />} />
+                <Route path="/dealer/kyc-rejected" element={<KYCRejected />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
