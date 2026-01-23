@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  ArrowLeft, Globe, Bell, Moon, Sun, Shield, Smartphone, 
+  ArrowLeft, Globe, Bell, Moon, Sun, MapPin,
   HelpCircle, FileText, MessageSquare, Trash2, ChevronRight,
   Volume2, Vibrate, Download, RefreshCw
 } from 'lucide-react';
@@ -52,6 +52,12 @@ const Settings = () => {
           label: isHindi ? 'भाषा' : 'Language',
           description: i18n.language === 'hi' ? 'हिंदी' : 'English',
           action: 'language',
+        },
+        {
+          icon: MapPin,
+          label: isHindi ? 'लोकेशन' : 'Location',
+          description: user?.location || (isHindi ? 'सेट नहीं' : 'Not set'),
+          action: 'location',
         },
         {
           icon: darkMode ? Moon : Sun,
@@ -141,52 +147,32 @@ const Settings = () => {
   return (
     <AppLayout>
       <div className="container px-4 py-4 pb-8">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-3 mb-6"
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10 rounded-xl"
-            onClick={() => navigate(-1)}
-          >
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl font-bold text-foreground">
-            {isHindi ? 'सेटिंग्स' : 'Settings'}
-          </h1>
+          <h1 className="text-xl font-bold text-foreground">{isHindi ? 'सेटिंग्स' : 'Settings'}</h1>
         </motion.div>
 
         <div className="space-y-6">
           {settingsSections.map((section, sectionIndex) => (
-            <motion.div
-              key={section.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: sectionIndex * 0.1 }}
-            >
-              <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">
-                {section.title}
-              </h2>
+            <motion.div key={section.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: sectionIndex * 0.1 }}>
+              <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-1">{section.title}</h2>
               <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-soft">
                 {section.items.map((item, itemIndex) => {
                   const Icon = item.icon;
                   return (
                     <div
                       key={itemIndex}
-                      className={cn(
-                        'flex items-center gap-3 p-4 border-b border-border last:border-0',
-                        item.action && 'cursor-pointer hover:bg-muted/50 transition-colors'
-                      )}
+                      className={cn('flex items-center gap-3 p-4 border-b border-border last:border-0', item.action && 'cursor-pointer hover:bg-muted/50 transition-colors')}
                       onClick={() => {
-                        if (item.action === 'language') {
-                          handleLanguageChange(i18n.language === 'hi' ? 'en' : 'hi');
-                        } else if (item.action) {
-                          toast.info('This feature is coming soon!');
-                        }
+                        if (item.action === 'language') handleLanguageChange(i18n.language === 'hi' ? 'en' : 'hi');
+                        else if (item.action === 'location') navigate('/settings/location');
+                        else if (item.action) toast.info('Coming soon!');
                       }}
                     >
                       <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center">
@@ -196,14 +182,7 @@ const Settings = () => {
                         <p className="text-sm font-medium text-foreground">{item.label}</p>
                         <p className="text-xs text-muted-foreground">{item.description}</p>
                       </div>
-                      {item.toggle ? (
-                        <Switch
-                          checked={item.value}
-                          onCheckedChange={item.onChange}
-                        />
-                      ) : (
-                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                      )}
+                      {item.toggle ? <Switch checked={item.value} onCheckedChange={item.onChange} /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                     </div>
                   );
                 })}
@@ -211,42 +190,17 @@ const Settings = () => {
             </motion.div>
           ))}
 
-          {/* Account Actions */}
           {user && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="space-y-3 pt-4"
-            >
-              <Button 
-                variant="outline" 
-                className="w-full h-12 rounded-xl text-foreground"
-                onClick={handleLogout}
-              >
-                {isHindi ? 'लॉग आउट करें' : 'Log Out'}
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full h-12 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={handleDeleteAccount}
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                {isHindi ? 'खाता हटाएं' : 'Delete Account'}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="space-y-3 pt-4">
+              <Button variant="outline" className="w-full h-12 rounded-xl text-foreground" onClick={handleLogout}>{isHindi ? 'लॉग आउट करें' : 'Log Out'}</Button>
+              <Button variant="ghost" className="w-full h-12 rounded-xl text-destructive hover:text-destructive hover:bg-destructive/10" onClick={handleDeleteAccount}>
+                <Trash2 className="h-4 w-4 mr-2" />{isHindi ? 'खाता हटाएं' : 'Delete Account'}
               </Button>
             </motion.div>
           )}
 
-          {/* App Version */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="text-center pt-4"
-          >
-            <p className="text-xs text-muted-foreground">
-              KISHU v1.0.0 • Made with 💚 for Indian Farmers
-            </p>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="text-center pt-4">
+            <p className="text-xs text-muted-foreground">KISHU v1.0.0 • Made with 💚 for Indian Farmers</p>
           </motion.div>
         </div>
       </div>
