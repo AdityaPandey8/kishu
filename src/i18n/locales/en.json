@@ -42,7 +42,19 @@
     "signupSuccess": "Account created successfully!",
     "selectRole": "I am a",
     "farmer": "Farmer",
-    "dealer": "Dealer"
+    "dealer": "Dealer",
+    "selectRoleTitle": "Choose how you want to continue",
+    "farmerTitle": "Farmer Login",
+    "dealerTitle": "Dealer Login",
+    "adminTitle": "Admin Login",
+    "farmerSignupTitle": "Create Farmer Account",
+    "dealerSignupTitle": "Create Dealer Account",
+    "notAFarmer": "Not a farmer?",
+    "notADealer": "Not a dealer?",
+    "notAnAdmin": "Not an admin?",
+    "chooseRole": "Choose a different role",
+    "kycRequired": "KYC verification required",
+    "adminOnly": "Authorized personnel only"
   },
   "home": {
     "welcome": "Welcome",
