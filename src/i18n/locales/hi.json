@@ -42,7 +42,19 @@
     "signupSuccess": "खाता सफलतापूर्वक बनाया गया!",
     "selectRole": "मैं हूं",
     "farmer": "किसान",
-    "dealer": "डीलर"
+    "dealer": "डीलर",
+    "selectRoleTitle": "जारी रखने के लिए चुनें",
+    "farmerTitle": "किसान लॉगिन",
+    "dealerTitle": "डीलर लॉगिन",
+    "adminTitle": "एडमिन लॉगिन",
+    "farmerSignupTitle": "किसान खाता बनाएं",
+    "dealerSignupTitle": "डीलर खाता बनाएं",
+    "notAFarmer": "किसान नहीं हैं?",
+    "notADealer": "डीलर नहीं हैं?",
+    "notAnAdmin": "एडमिन नहीं हैं?",
+    "chooseRole": "दूसरी भूमिका चुनें",
+    "kycRequired": "KYC सत्यापन आवश्यक",
+    "adminOnly": "केवल अधिकृत कर्मचारी"
   },
   "home": {
     "welcome": "स्वागत है",

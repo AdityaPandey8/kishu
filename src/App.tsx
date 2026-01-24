@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { DataProvider } from "@/contexts/DataContext";
 import { SettingsProvider } from "@/contexts/SettingsContext";
@@ -10,8 +10,12 @@ import { OfflineIndicator } from "@/components/common/OfflineIndicator";
 import "@/i18n";
 
 import Index from "./pages/Index";
-import Login from "./pages/auth/Login";
-import Signup from "./pages/auth/Signup";
+import AuthLanding from "./pages/auth/AuthLanding";
+import FarmerLogin from "./pages/auth/FarmerLogin";
+import FarmerSignup from "./pages/auth/FarmerSignup";
+import DealerLogin from "./pages/auth/DealerLogin";
+import DealerSignup from "./pages/auth/DealerSignup";
+import AdminLogin from "./pages/auth/AdminLogin";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Scan from "./pages/Scan";
 import History from "./pages/History";
@@ -68,8 +72,16 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
+                {/* Role-based auth routes */}
+                <Route path="/auth" element={<AuthLanding />} />
+                <Route path="/auth/farmer/login" element={<FarmerLogin />} />
+                <Route path="/auth/farmer/signup" element={<FarmerSignup />} />
+                <Route path="/auth/dealer/login" element={<DealerLogin />} />
+                <Route path="/auth/dealer/signup" element={<DealerSignup />} />
+                <Route path="/auth/admin/login" element={<AdminLogin />} />
+                {/* Redirect old routes to new auth landing */}
+                <Route path="/login" element={<Navigate to="/auth" replace />} />
+                <Route path="/signup" element={<Navigate to="/auth" replace />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/scan" element={<Scan />} />
                 <Route path="/history" element={<History />} />

@@ -33,22 +33,27 @@ export interface User {
   kycRejectionReason?: string;
 }
 
+interface LoginResult {
+  user: User;
+}
+
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<LoginResult>;
   signup: (data: SignupData) => Promise<void>;
   logout: () => void;
   updateUser: (data: Partial<User>) => void;
   updateLocation: (coordinates: UserCoordinates, manualLocation?: boolean) => void;
 }
 
-interface SignupData {
+export interface SignupData {
   email: string;
   password: string;
   name: string;
   role: UserRole;
   phone?: string;
+  businessName?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -108,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<LoginResult> => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     
     // Check for demo accounts first
@@ -117,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const demoUser = DEMO_ACCOUNTS[lowerEmail];
       setUser(demoUser);
       localStorage.setItem('kishu-user', JSON.stringify(demoUser));
-      return;
+      return { user: demoUser };
     }
     
     // For other emails, determine role by keyword
@@ -138,6 +143,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     setUser(mockUser);
     localStorage.setItem('kishu-user', JSON.stringify(mockUser));
+    return { user: mockUser };
   };
 
   const signup = async (data: SignupData) => {
