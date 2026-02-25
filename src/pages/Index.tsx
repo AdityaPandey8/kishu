@@ -17,7 +17,7 @@ const Index = () => {
 
   // If not logged in, show farmer dashboard as guest
   if (!user) {
-    return <FarmerDashboard />;
+    return <Navigate to="/auth" replace />;
   }
 
   // Role-based dashboard routing
