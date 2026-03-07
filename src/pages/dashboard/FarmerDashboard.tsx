@@ -12,19 +12,33 @@ import { CropGuide } from '@/components/home/CropGuide';
 import { WeatherAlertsWidget } from '@/components/home/WeatherAlertsWidget';
 import { useAuth } from '@/contexts/AuthContext';
 
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 },
+  },
+};
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+
 const FarmerDashboard = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
 
   return (
     <AppLayout>
-      <div className="container px-4 py-6 space-y-5">
+      <motion.div
+        className="container px-4 py-6 space-y-5"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Welcome Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <motion.div variants={staggerItem}>
           <p className="text-sm text-muted-foreground">{t('home.welcome')},</p>
           <h1 className="text-2xl font-bold text-foreground">{user?.name || 'Farmer'} 👋</h1>
         </motion.div>
@@ -55,7 +69,7 @@ const FarmerDashboard = () => {
 
         {/* Recent Diagnoses */}
         <RecentDiagnoses />
-      </div>
+      </motion.div>
     </AppLayout>
   );
 };

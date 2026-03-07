@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Leaf, Globe, User, LogIn, Bell, Search, Moon, Sun, Menu } from 'lucide-react';
+import { Leaf, Globe, User, LogIn, Bell, Search, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -51,7 +51,12 @@ export const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full safe-area-inset">
+    <motion.header
+      className="sticky top-0 z-50 w-full safe-area-inset"
+      initial={{ y: -60, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+    >
       {/* Glass-morphism header background */}
       <div className="absolute inset-0 bg-background/80 backdrop-blur-xl border-b border-border/40" />
       
@@ -63,19 +68,15 @@ export const Header = () => {
         <motion.button 
           onClick={() => navigate('/')}
           className="flex items-center gap-3"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           <motion.div 
             className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 shadow-lg"
-            whileHover={{ rotate: [0, -10, 10, 0] }}
-            transition={{ duration: 0.5 }}
+            animate={{ y: [0, -3, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           >
             <Leaf className="h-5 w-5 text-primary-foreground" />
-            {/* Glow effect */}
             <div className="absolute inset-0 rounded-xl bg-primary/30 blur-lg -z-10" />
           </motion.div>
           <div className="flex flex-col">
@@ -102,14 +103,9 @@ export const Header = () => {
         </motion.button>
 
         {/* Right Actions */}
-        <motion.div 
-          className="flex items-center gap-1"
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
+        <div className="flex items-center gap-1">
           {/* Search */}
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
             <Button
               variant="ghost"
               size="icon"
@@ -121,7 +117,7 @@ export const Header = () => {
           </motion.div>
 
           {/* Dark Mode Toggle */}
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
             <Button
               variant="ghost"
               size="icon"
@@ -131,7 +127,7 @@ export const Header = () => {
               <motion.div
                 initial={false}
                 animate={{ rotate: settings.darkMode ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
               >
                 {settings.darkMode ? (
                   <Sun className="h-4 w-4 text-amber-500" />
@@ -144,7 +140,7 @@ export const Header = () => {
 
           {/* Notifications */}
           {user && (
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
               <Button
                 variant="ghost"
                 size="icon"
@@ -156,6 +152,7 @@ export const Header = () => {
                   <motion.span 
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
                     className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-[10px] text-white flex items-center justify-center font-medium shadow-lg"
                   >
                     {unreadCount > 9 ? '9+' : unreadCount}
@@ -203,7 +200,7 @@ export const Header = () => {
 
           {/* Auth / Profile */}
           {user ? (
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
               <Button
                 variant="ghost"
                 size="icon"
@@ -212,13 +209,12 @@ export const Header = () => {
               >
                 <div className="h-full w-full rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 flex items-center justify-center relative">
                   <User className="h-4 w-4 text-primary-foreground" />
-                  {/* Online indicator */}
                   <span className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-green-500 ring-2 ring-background" />
                 </div>
               </Button>
             </motion.div>
           ) : (
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 size="sm"
                 className="h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25"
@@ -229,8 +225,8 @@ export const Header = () => {
               </Button>
             </motion.div>
           )}
-        </motion.div>
+        </div>
       </div>
-    </header>
+    </motion.header>
   );
 };

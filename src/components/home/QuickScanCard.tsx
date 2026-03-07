@@ -10,20 +10,36 @@ export const QuickScanCard = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.1 }}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+      whileHover={{ scale: 1.02, y: -4 }}
       className="relative overflow-hidden rounded-2xl gradient-kishu p-6 shadow-kishu"
+      style={{ transformPerspective: 1000 }}
     >
       {/* Background decoration */}
-      <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-white/10" />
-      <div className="absolute -right-2 bottom-0 h-20 w-20 rounded-full bg-white/5" />
+      <motion.div
+        className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-white/10"
+        animate={{ scale: [1, 1.1, 1], rotate: [0, 5, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute -right-2 bottom-0 h-20 w-20 rounded-full bg-white/5"
+        animate={{ scale: [1, 1.15, 1] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+      />
       
       <div className="relative z-10">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="h-4 w-4 text-primary-foreground/80" />
+              <motion.div
+                animate={{ rotate: [0, 15, -15, 0] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+              >
+                <Sparkles className="h-4 w-4 text-primary-foreground/80" />
+              </motion.div>
               <span className="text-xs font-medium text-primary-foreground/80 uppercase tracking-wide">
                 AI-Powered
               </span>
@@ -37,7 +53,7 @@ export const QuickScanCard = () => {
           </div>
           
           <motion.div
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.1, rotateZ: 5 }}
             whileTap={{ scale: 0.95 }}
           >
             <Button

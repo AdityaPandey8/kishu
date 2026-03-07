@@ -17,9 +17,10 @@ export const CropGuide = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.5 }}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.1 }}
     >
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-foreground flex items-center gap-2">
@@ -39,11 +40,15 @@ export const CropGuide = () => {
         {crops.map((crop, index) => (
           <motion.button
             key={crop.id}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.55 + index * 0.05 }}
+            initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
+            whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+            viewport={{ once: true }}
+            transition={{ type: 'spring', stiffness: 150, delay: index * 0.08 }}
+            whileHover={{ scale: 1.1, y: -6, rotateY: 10 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => navigate(`/crops/${crop.id}`)}
             className={`${crop.color} rounded-xl p-3 flex flex-col items-center gap-1 hover:shadow-md transition-shadow`}
+            style={{ transformPerspective: 800 }}
           >
             <span className="text-2xl">{crop.emoji}</span>
             <span className="text-xs font-medium text-foreground">
