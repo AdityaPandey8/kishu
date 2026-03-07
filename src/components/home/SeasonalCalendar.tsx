@@ -22,10 +22,13 @@ export const SeasonalCalendar = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.35 }}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.1 }}
+      whileHover={{ scale: 1.02, y: -2 }}
       className="rounded-2xl bg-card border border-border p-4 shadow-soft"
+      style={{ transformPerspective: 1000 }}
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-foreground flex items-center gap-2">
@@ -43,9 +46,11 @@ export const SeasonalCalendar = () => {
           return (
             <motion.div
               key={index}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 + index * 0.05 }}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ type: 'spring', stiffness: 120, delay: index * 0.08 }}
+              whileHover={{ x: 4, scale: 1.02 }}
               className={`flex items-center gap-3 p-2.5 rounded-xl border ${priorityColors[item.priority as keyof typeof priorityColors]}`}
             >
               <Icon className="h-4 w-4 flex-shrink-0" />

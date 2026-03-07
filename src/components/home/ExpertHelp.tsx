@@ -9,15 +9,22 @@ export const ExpertHelp = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.45 }}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.1 }}
+      whileHover={{ scale: 1.02, y: -4 }}
       className="rounded-2xl bg-gradient-to-br from-secondary to-secondary/50 border border-border p-4 shadow-soft"
+      style={{ transformPerspective: 1000 }}
     >
       <div className="flex items-start gap-4">
-        <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0">
+        <motion.div
+          className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center flex-shrink-0"
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        >
           <MessageCircle className="h-6 w-6 text-primary" />
-        </div>
+        </motion.div>
         <div className="flex-1">
           <h3 className="font-semibold text-foreground mb-1">
             {isHindi ? 'विशेषज्ञ से बात करें' : 'Talk to an Expert'}

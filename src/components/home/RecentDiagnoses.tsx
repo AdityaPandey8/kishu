@@ -5,7 +5,6 @@ import { ChevronRight, Leaf, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-// Mock data - will be replaced with actual data
 const mockDiagnoses = [
   {
     id: '1',
@@ -39,9 +38,10 @@ export const RecentDiagnoses = () => {
   if (mockDiagnoses.length === 0) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.4 }}
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ type: 'spring', stiffness: 100, damping: 20 }}
         className="rounded-2xl bg-card border border-border p-6 text-center shadow-soft"
       >
         <Leaf className="h-12 w-12 mx-auto text-muted-foreground/40 mb-3" />
@@ -52,9 +52,10 @@ export const RecentDiagnoses = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.4 }}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.1 }}
     >
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold text-foreground">{t('home.recentDiagnoses')}</h3>
@@ -77,11 +78,14 @@ export const RecentDiagnoses = () => {
           return (
             <motion.button
               key={diagnosis.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ type: 'spring', stiffness: 120, delay: index * 0.1 }}
+              whileHover={{ scale: 1.02, x: 4 }}
               onClick={() => navigate(`/diagnosis/${diagnosis.id}`)}
               className="w-full flex items-center gap-3 p-3 rounded-xl bg-card border border-border shadow-soft hover:shadow-md transition-shadow text-left"
+              style={{ transformPerspective: 800 }}
             >
               <div className={cn('flex h-10 w-10 items-center justify-center rounded-lg', severity.bg)}>
                 <Icon className={cn('h-5 w-5', severity.color)} />

@@ -16,10 +16,13 @@ export const MarketPrices = () => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: 0.25 }}
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ type: 'spring', stiffness: 100, damping: 20, delay: 0.15 }}
+      whileHover={{ scale: 1.03, y: -4 }}
       className="rounded-2xl bg-card border border-border p-4 shadow-soft"
+      style={{ transformPerspective: 1000 }}
     >
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-foreground flex items-center gap-2">
@@ -35,10 +38,13 @@ export const MarketPrices = () => {
           return (
             <motion.div
               key={item.crop}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 + index * 0.05 }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ type: 'spring', stiffness: 120, delay: 0.2 + index * 0.06 }}
+              whileHover={{ scale: 1.05, rotateY: 5 }}
               className="bg-muted/50 rounded-xl p-3"
+              style={{ transformPerspective: 800 }}
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-medium text-foreground">
