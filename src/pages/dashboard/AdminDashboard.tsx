@@ -38,11 +38,17 @@ const AdminDashboard = () => {
 
   return (
     <AppLayout>
-      <div className="container px-4 py-6 space-y-5">
+      <motion.div
+        className="container px-4 py-6 space-y-5"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
         {/* Welcome */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 100, damping: 20 }}
           className="flex items-center justify-between"
         >
           <div>
@@ -65,10 +71,13 @@ const AdminDashboard = () => {
             return (
               <motion.div
                 key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+                initial={{ opacity: 0, y: 30, rotateX: -10 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                viewport={{ once: true }}
+                transition={{ type: 'spring', stiffness: 100, delay: index * 0.06 }}
+                whileHover={{ scale: 1.05, y: -4 }}
                 className="bg-card border border-border rounded-2xl p-4 shadow-soft"
+                style={{ transformPerspective: 800 }}
               >
                 <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center mb-3', stat.bg)}>
                   <Icon className={cn('h-5 w-5', stat.color)} />
@@ -83,9 +92,10 @@ const AdminDashboard = () => {
 
         {/* Pending Approvals */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ type: 'spring', stiffness: 100, damping: 20 }}
           className="bg-card border border-border rounded-2xl p-4 shadow-soft"
         >
           <div className="flex items-center justify-between mb-4">
@@ -101,9 +111,11 @@ const AdminDashboard = () => {
             {pendingApprovals.map((item, index) => (
               <motion.div
                 key={item.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.25 + index * 0.05 }}
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ type: 'spring', stiffness: 120, delay: index * 0.08 }}
+                whileHover={{ x: 4, scale: 1.02 }}
                 className="flex items-center justify-between p-3 bg-muted/50 rounded-xl"
               >
                 <div className="flex items-center gap-3">
@@ -130,9 +142,10 @@ const AdminDashboard = () => {
 
         {/* Recent Activity */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ type: 'spring', stiffness: 100, damping: 20 }}
         >
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold text-foreground flex items-center gap-2">
@@ -149,9 +162,11 @@ const AdminDashboard = () => {
               return (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.45 + index * 0.05 }}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ type: 'spring', stiffness: 120, delay: index * 0.06 }}
+                  whileHover={{ x: 4 }}
                   className="flex items-center gap-3 p-3 border-b border-border last:border-0"
                 >
                   <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
@@ -167,7 +182,7 @@ const AdminDashboard = () => {
             })}
           </div>
         </motion.div>
-      </div>
+      </motion.div>
     </AppLayout>
   );
 };

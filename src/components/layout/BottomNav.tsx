@@ -11,7 +11,6 @@ export const BottomNav = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Farmer navigation items - updated with Shop and Reels
   const farmerNavItems = [
     { key: 'home', icon: Home, path: '/', label: t('nav.home') },
     { key: 'shop', icon: ShoppingBag, path: '/shop', label: 'Shop' },
@@ -20,7 +19,6 @@ export const BottomNav = () => {
     { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
   ];
 
-  // Dealer navigation items - customized for dealer workflow
   const dealerNavItems = [
     { key: 'home', icon: Home, path: '/', label: 'Dashboard' },
     { key: 'products', icon: Package, path: '/products', label: 'Products' },
@@ -29,7 +27,6 @@ export const BottomNav = () => {
     { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
   ];
 
-  // Admin navigation items
   const adminNavItems = [
     { key: 'home', icon: Home, path: '/', label: 'Dashboard' },
     { key: 'users', icon: Users, path: '/users', label: 'Users' },
@@ -38,29 +35,30 @@ export const BottomNav = () => {
     { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
   ];
 
-  // Select nav items based on user role
   const getNavItems = () => {
     switch (user?.role) {
-      case 'dealer':
-        return dealerNavItems;
-      case 'admin':
-        return adminNavItems;
-      default:
-        return farmerNavItems;
+      case 'dealer': return dealerNavItems;
+      case 'admin': return adminNavItems;
+      default: return farmerNavItems;
     }
   };
 
   const navItems = getNavItems();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-inset">
+    <motion.nav
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-inset"
+      initial={{ y: 80 }}
+      animate={{ y: 0 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 20, delay: 0.3 }}
+    >
       <div className="container flex h-16 items-center justify-around px-2">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon;
 
           return (
-            <button
+            <motion.button
               key={item.key}
               onClick={() => navigate(item.path)}
               className={cn(
@@ -69,6 +67,8 @@ export const BottomNav = () => {
                   ? 'text-primary' 
                   : 'text-muted-foreground hover:text-foreground'
               )}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
             >
               {isActive && (
                 <motion.div
@@ -81,10 +81,10 @@ export const BottomNav = () => {
               <span className="text-[10px] font-medium relative z-10">
                 {item.label}
               </span>
-            </button>
+            </motion.button>
           );
         })}
       </div>
-    </nav>
+    </motion.nav>
   );
 };

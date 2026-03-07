@@ -1,6 +1,7 @@
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Leaf, Tractor, Store, Shield, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -51,26 +52,45 @@ const AuthLanding = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isHindi = i18n.language === 'hi';
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: containerRef });
+  const blob1Y = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const blob2Y = useTransform(scrollYProgress, [0, 1], [0, 40]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col">
-      {/* Decorative elements */}
+    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col">
+      {/* Parallax decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-accent/20 blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-green-500/5 via-orange-500/5 to-violet-500/5 blur-3xl" />
+        <motion.div
+          className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-primary/10 blur-3xl"
+          style={{ y: blob1Y }}
+        />
+        <motion.div
+          className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-accent/20 blur-3xl"
+          style={{ y: blob2Y }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-green-500/5 via-orange-500/5 to-violet-500/5 blur-3xl"
+          animate={{ scale: [1, 1.05, 1], rotate: [0, 3, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+        />
       </div>
 
       <div className="relative flex-1 flex flex-col justify-center px-6 py-12">
         {/* Logo */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: -30, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 100, damping: 15 }}
           className="flex flex-col items-center mb-10"
         >
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-kishu shadow-kishu mb-4">
+          <motion.div
+            className="flex h-16 w-16 items-center justify-center rounded-2xl gradient-kishu shadow-kishu mb-4"
+            animate={{ y: [0, -6, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+          >
             <Leaf className="h-8 w-8 text-primary-foreground" />
-          </div>
+          </motion.div>
           <h1 className="text-3xl font-bold text-gradient-kishu">{t('common.appName')}</h1>
           <p className="text-muted-foreground mt-2">{t('common.tagline')}</p>
         </motion.div>
@@ -79,7 +99,7 @@ const AuthLanding = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.2 }}
           className="text-center mb-8"
         >
           <h2 className="text-xl font-semibold text-foreground">
@@ -90,22 +110,29 @@ const AuthLanding = () => {
           </p>
         </motion.div>
 
-        {/* Role Cards */}
+        {/* Role Cards with 3D tilt */}
         <div className="w-full max-w-md mx-auto space-y-4">
           {roles.map((role, index) => {
             const Icon = role.icon;
             return (
               <motion.div
                 key={role.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + index * 0.1 }}
+                initial={{ opacity: 0, y: 40, rotateX: -10 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                viewport={{ once: true }}
+                transition={{ type: 'spring', stiffness: 100, damping: 18, delay: 0.1 + index * 0.1 }}
+                whileHover={{ scale: 1.03, y: -6, rotateX: 3, rotateY: -2 }}
                 className={`${role.bgColor} ${role.borderColor} border-2 rounded-2xl p-5 backdrop-blur-sm`}
+                style={{ transformPerspective: 1000 }}
               >
                 <div className="flex items-start gap-4">
-                  <div className={`h-14 w-14 rounded-xl bg-gradient-to-br ${role.color} flex items-center justify-center shadow-lg flex-shrink-0`}>
+                  <motion.div
+                    className={`h-14 w-14 rounded-xl bg-gradient-to-br ${role.color} flex items-center justify-center shadow-lg flex-shrink-0`}
+                    whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
+                    transition={{ duration: 0.5 }}
+                  >
                     <Icon className="h-7 w-7 text-white" />
-                  </div>
+                  </motion.div>
                   <div className="flex-1">
                     <h3 className={`text-lg font-semibold ${role.textColor}`}>
                       {isHindi ? role.labelHi : role.label}
@@ -142,7 +169,7 @@ const AuthLanding = () => {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.6 }}
           className="text-center text-xs text-muted-foreground mt-8"
         >
           {isHindi 
