@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search, ShoppingCart, Star, Package, Heart, Zap, Sprout, Bug, Leaf, Wrench, FlaskConical, ChevronRight, Timer } from 'lucide-react';
+import { Search, ShoppingCart, Star, Package, Heart, Zap, Sprout, Bug, Leaf, Wrench, FlaskConical, ChevronRight, Timer, Flower2 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,7 @@ const categoryIcons = [
   { name: 'Fungicide', icon: FlaskConical, color: 'bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-400' },
   { name: 'Organic', icon: Leaf, color: 'bg-lime-100 text-lime-600 dark:bg-lime-950 dark:text-lime-400' },
   { name: 'Equipment', icon: Wrench, color: 'bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400' },
+  { name: 'Plants', icon: Flower2, color: 'bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-400' },
 ];
 
 const banners = [
@@ -25,6 +26,7 @@ const banners = [
   { id: 2, title: 'Organic Week', subtitle: 'Premium organic products at best prices', gradient: 'from-emerald-600 to-emerald-400' },
   { id: 3, title: 'Fertilizer Deals', subtitle: 'DAP & Urea at wholesale rates', gradient: 'from-amber-600 to-amber-400' },
   { id: 4, title: 'Pest Control Essentials', subtitle: 'Protect your crops this season', gradient: 'from-red-600 to-red-400' },
+  { id: 5, title: 'Nursery Plants Collection', subtitle: 'Fresh plants delivered to your doorstep', gradient: 'from-pink-600 to-pink-400' },
 ];
 
 const Shop = () => {
