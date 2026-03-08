@@ -86,12 +86,6 @@ const OrderManagement = () => {
           </div>
         </div>
         <div className="flex items-center gap-1.5">
-          {inquiry.urgent && (
-            <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4">
-              <AlertTriangle className="h-2.5 w-2.5 mr-0.5" />
-              {isHindi ? 'अत्यावश्यक' : 'Urgent'}
-            </Badge>
-          )}
           <span className="text-[10px] text-muted-foreground">{timeAgo(inquiry.createdAt)}</span>
         </div>
       </div>
@@ -100,9 +94,9 @@ const OrderManagement = () => {
       <div className="bg-muted/50 rounded-lg p-2.5 space-y-1.5">
         <div className="flex items-center gap-1.5">
           <Sprout className="h-3.5 w-3.5 text-primary" />
-          <span className="text-xs font-medium text-foreground">{inquiry.crop}</span>
+          <span className="text-xs font-medium text-foreground">{inquiry.subject}</span>
         </div>
-        <p className="text-xs text-muted-foreground leading-relaxed">{inquiry.issue}</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">{inquiry.message}</p>
       </div>
 
       {/* Response if exists */}

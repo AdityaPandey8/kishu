@@ -48,11 +48,11 @@ const BuyerProfile = () => {
     ...buyerInquiries.map(i => ({
       id: i.id,
       type: 'inquiry' as const,
-      title: i.crop,
-      subtitle: i.issue,
+      title: i.subject,
+      subtitle: i.message,
       status: i.status,
       date: i.createdAt,
-      urgent: i.urgent,
+      inquiryType: i.type,
     })),
     ...buyerOrders.map(o => ({
       id: o.id,
@@ -61,7 +61,7 @@ const BuyerProfile = () => {
       subtitle: o.items.map(i => i.productName).join(', '),
       status: o.status,
       date: o.createdAt,
-      urgent: false,
+      inquiryType: undefined as string | undefined,
     })),
   ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
@@ -206,12 +206,6 @@ const BuyerProfile = () => {
                         <div className="flex items-center gap-1 mt-1.5">
                           <Clock className="h-3 w-3 text-muted-foreground" />
                           <span className="text-[10px] text-muted-foreground">{formatDate(item.date)}</span>
-                          {item.urgent && (
-                            <Badge variant="destructive" className="text-[8px] px-1 py-0 h-3.5 ml-1">
-                              <AlertTriangle className="h-2 w-2 mr-0.5" />
-                              Urgent
-                            </Badge>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -258,11 +252,11 @@ const BuyerProfile = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <Sprout className="h-3.5 w-3.5 text-primary" />
-                        <span className="text-xs font-semibold text-foreground">{inq.crop}</span>
+                        <span className="text-xs font-semibold text-foreground">{inq.subject}</span>
                       </div>
                       {statusBadge(inq.status)}
                     </div>
-                    <p className="text-xs text-muted-foreground">{inq.issue}</p>
+                    <p className="text-xs text-muted-foreground">{inq.message}</p>
                     {inq.response && (
                       <div className="bg-primary/5 border border-primary/10 rounded-lg p-2">
                         <p className="text-[10px] font-medium text-primary mb-0.5">{isHindi ? 'जवाब' : 'Response'}</p>
@@ -272,9 +266,6 @@ const BuyerProfile = () => {
                     <div className="flex items-center gap-1">
                       <Clock className="h-3 w-3 text-muted-foreground" />
                       <span className="text-[10px] text-muted-foreground">{formatDate(inq.createdAt)}</span>
-                      {inq.urgent && (
-                        <Badge variant="destructive" className="text-[8px] px-1 py-0 h-3.5 ml-1">Urgent</Badge>
-                      )}
                     </div>
                   </div>
                 ))
