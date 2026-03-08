@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Users, MessageSquare, Heart, Share2, Plus, Search,
+  Users, MessageSquare, Heart, Share2, Search,
   Clock, MapPin, Bookmark, Play, Film, Image, FileText,
-  ChevronDown, ChevronUp, Send
+  Send
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';

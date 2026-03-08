@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { 
-  ArrowLeft, Heart, MessageSquare, Share2, Bookmark, Send,
-  ThumbsUp, Eye, Clock, MapPin, UserPlus, UserCheck
+  ArrowLeft, Heart, Share2, Bookmark, Send,
+  Clock, UserPlus, UserCheck, Film
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

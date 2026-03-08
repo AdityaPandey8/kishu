@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Plus, Play, Heart, Eye, Users, TrendingUp, 
-  Video, Settings, MoreVertical, Trash2, Edit, BarChart3,
-  FileText, Film, Image, PenSquare
+  Video, Settings, MoreVertical, Trash2, BarChart3,
+  FileText, Film, PenSquare, MessageSquare, Share2
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
