@@ -57,6 +57,9 @@ import ExpertDashboard from "./pages/ExpertDashboard";
 import Experts from "./pages/Experts";
 import AdminExperts from "./pages/admin/AdminExperts";
 import AdminKYC from "./pages/admin/AdminKYC";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminInquiries from "./pages/admin/AdminInquiries";
+import AdminContent from "./pages/admin/AdminContent";
 import DealerKYC from "./pages/dealer/DealerKYC";
 import KYCPending from "./pages/dealer/KYCPending";
 import KYCRejected from "./pages/dealer/KYCRejected";
@@ -130,6 +133,9 @@ const App = () => (
                 <Route path="/expert-dashboard" element={<ExpertDashboard />} />
                 <Route path="/admin/experts" element={<AdminExperts />} />
                 <Route path="/admin/kyc" element={<AdminKYC />} />
+                <Route path="/admin/orders" element={<AdminOrders />} />
+                <Route path="/admin/inquiries" element={<AdminInquiries />} />
+                <Route path="/admin/content" element={<AdminContent />} />
                 <Route path="/dealer/kyc" element={<DealerKYC />} />
                 <Route path="/dealer/kyc-pending" element={<KYCPending />} />
                 <Route path="/dealer/kyc-rejected" element={<KYCRejected />} />
