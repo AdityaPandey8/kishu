@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { 
   CloudRain, AlertTriangle, Wind, 
-  Droplets, Sun, CloudSun, Bell, Search, Loader2, Cloud
+  Droplets, Sun, CloudSun, Bell, Search, Loader2, Cloud, Mic, MapPin
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 
 interface ForecastDay {
   date: string;
@@ -50,35 +51,67 @@ const getDayLabel = (dateStr: string) => {
 };
 
 const WeatherAlerts = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isHindi = i18n.language === 'hi';
-  const [location, setLocation] = useState(() => localStorage.getItem('kishu_weather_location') || 'Delhi');
+  const [location, setLocation] = useState(() => localStorage.getItem('kishu_weather_location') || '');
   const [searchInput, setSearchInput] = useState('');
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [detectingLocation, setDetectingLocation] = useState(false);
 
-  const fetchWeather = async (loc: string) => {
+  const fetchWeather = useCallback(async (loc?: string, coords?: { lat: number; lng: number }) => {
     setLoading(true);
     setError('');
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('search-weather', {
-        body: { location: loc },
-      });
+      const body: any = {};
+      if (coords) {
+        body.lat = coords.lat;
+        body.lng = coords.lng;
+      } else if (loc) {
+        body.location = loc;
+      }
+      const { data, error: fnError } = await supabase.functions.invoke('search-weather', { body });
       if (fnError) throw fnError;
       if (data?.error) throw new Error(data.error);
       setWeather(data);
-      setLocation(loc);
-      localStorage.setItem('kishu_weather_location', loc);
+      if (data?.location) {
+        setLocation(data.location);
+        localStorage.setItem('kishu_weather_location', data.location);
+      }
     } catch (e: any) {
       setError(e.message || 'Failed to fetch weather');
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  const { isListening, startListening, stopListening, supported } = useVoiceSearch({
+    onResult: (transcript) => {
+      setSearchInput(transcript);
+      fetchWeather(transcript.trim());
+    },
+  });
+
+  const useMyLocation = useCallback(() => {
+    if (!navigator.geolocation) return;
+    setDetectingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setDetectingLocation(false);
+        fetchWeather(undefined, { lat: pos.coords.latitude, lng: pos.coords.longitude });
+      },
+      () => setDetectingLocation(false),
+      { timeout: 8000 }
+    );
+  }, [fetchWeather]);
 
   useEffect(() => {
-    fetchWeather(location);
+    if (location) {
+      fetchWeather(location);
+    } else {
+      useMyLocation();
+    }
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -96,20 +129,20 @@ const WeatherAlerts = () => {
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Bell className="h-6 w-6 text-primary" />
-            {isHindi ? 'मौसम की जानकारी' : 'Weather Info'}
+            {t('home.weather')}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {weather ? `${weather.location}${weather.region ? ', ' + weather.region : ''}` : (isHindi ? 'शहर खोजें' : 'Search a city')}
+            {weather ? `${weather.location}${weather.region ? ', ' + weather.region : ''}` : t('common.search')}
           </p>
         </motion.div>
 
-        {/* Search */}
+        {/* Search + Location */}
         <motion.form
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
           onSubmit={handleSearch}
-          className="flex gap-2 mb-6"
+          className="flex gap-2 mb-3"
         >
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -120,10 +153,32 @@ const WeatherAlerts = () => {
               onChange={(e) => setSearchInput(e.target.value)}
             />
           </div>
+          {supported && (
+            <Button
+              type="button"
+              variant={isListening ? 'destructive' : 'outline'}
+              size="icon"
+              className={`h-11 w-11 rounded-xl ${isListening ? 'animate-pulse' : ''}`}
+              onClick={isListening ? stopListening : startListening}
+            >
+              <Mic className="h-4 w-4" />
+            </Button>
+          )}
           <Button type="submit" className="h-11 rounded-xl px-5" disabled={loading}>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : (isHindi ? 'खोजें' : 'Search')}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t('common.search')}
           </Button>
         </motion.form>
+
+        <Button
+          variant="outline"
+          size="sm"
+          className="mb-6 rounded-xl"
+          onClick={useMyLocation}
+          disabled={detectingLocation}
+        >
+          {detectingLocation ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1.5" /> : <MapPin className="h-3.5 w-3.5 mr-1.5" />}
+          {isHindi ? 'मेरा स्थान उपयोग करें' : 'Use my location'}
+        </Button>
 
         {loading && (
           <div className="flex items-center justify-center py-16">
@@ -140,7 +195,6 @@ const WeatherAlerts = () => {
 
         {weather && !loading && (
           <>
-            {/* Current Weather */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -165,7 +219,6 @@ const WeatherAlerts = () => {
               </div>
             </motion.div>
 
-            {/* Forecast */}
             {weather.forecast.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}

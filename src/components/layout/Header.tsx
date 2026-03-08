@@ -9,10 +9,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
 import { useSettings } from '@/contexts/SettingsContext';
+
+const languages = [
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'hi', label: 'हिंदी', flag: '🇮🇳' },
+  { code: 'ta', label: 'தமிழ்', flag: '🇮🇳' },
+  { code: 'te', label: 'తెలుగు', flag: '🇮🇳' },
+  { code: 'kn', label: 'ಕನ್ನಡ', flag: '🇮🇳' },
+  { code: 'ml', label: 'മലയാളം', flag: '🇮🇳' },
+  { code: 'bn', label: 'বাংলা', flag: '🇮🇳' },
+  { code: 'mr', label: 'मराठी', flag: '🇮🇳' },
+  { code: 'gu', label: 'ગુજરાતી', flag: '🇮🇳' },
+  { code: 'pa', label: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+  { code: 'or', label: 'ଓଡ଼ିଆ', flag: '🇮🇳' },
+];
 
 export const Header = () => {
   const { t, i18n } = useTranslation();
@@ -28,13 +43,13 @@ export const Header = () => {
   };
 
   const currentLang = i18n.language;
-  const isHindi = currentLang === 'hi';
   const isAuthPage = ['/login', '/signup', '/forgot-password'].includes(location.pathname);
 
   if (isAuthPage) return null;
 
   const getGreeting = () => {
     const hour = new Date().getHours();
+    const isHindi = currentLang === 'hi';
     if (hour < 12) return isHindi ? 'सुप्रभात' : 'Good Morning';
     if (hour < 17) return isHindi ? 'शुभ दोपहर' : 'Good Afternoon';
     return isHindi ? 'शुभ संध्या' : 'Good Evening';
@@ -42,12 +57,7 @@ export const Header = () => {
 
   const getRoleLabel = () => {
     if (!user) return '';
-    switch (user.role) {
-      case 'farmer': return isHindi ? 'किसान' : 'Farmer';
-      case 'dealer': return isHindi ? 'डीलर' : 'Dealer';
-      case 'admin': return isHindi ? 'एडमिन' : 'Admin';
-      default: return '';
-    }
+    return t(`auth.${user.role}`) || user.role;
   };
 
   return (
@@ -57,10 +67,7 @@ export const Header = () => {
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 120, damping: 20 }}
     >
-      {/* Glass-morphism header background */}
       <div className="absolute inset-0 bg-background/80 backdrop-blur-xl border-b border-border/40" />
-      
-      {/* Gradient accent line */}
       <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
       
       <div className="container relative flex h-16 items-center justify-between px-4">
@@ -104,57 +111,26 @@ export const Header = () => {
 
         {/* Right Actions */}
         <div className="flex items-center gap-1">
-          {/* Search */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-xl hover:bg-primary/10"
-              onClick={() => navigate('/search')}
-            >
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10" onClick={() => navigate('/search')}>
               <Search className="h-4 w-4 text-muted-foreground" />
             </Button>
           </motion.div>
 
-          {/* Dark Mode Toggle */}
           <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-xl hover:bg-primary/10"
-              onClick={toggleDarkMode}
-            >
-              <motion.div
-                initial={false}
-                animate={{ rotate: settings.darkMode ? 180 : 0 }}
-                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-              >
-                {settings.darkMode ? (
-                  <Sun className="h-4 w-4 text-amber-500" />
-                ) : (
-                  <Moon className="h-4 w-4 text-muted-foreground" />
-                )}
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/10" onClick={toggleDarkMode}>
+              <motion.div initial={false} animate={{ rotate: settings.darkMode ? 180 : 0 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }}>
+                {settings.darkMode ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-muted-foreground" />}
               </motion.div>
             </Button>
           </motion.div>
 
-          {/* Notifications */}
           {user && (
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-xl relative hover:bg-primary/10"
-                onClick={() => navigate('/notifications')}
-              >
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl relative hover:bg-primary/10" onClick={() => navigate('/notifications')}>
                 <Bell className="h-4 w-4 text-muted-foreground" />
                 {unreadCount > 0 && (
-                  <motion.span 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 300 }}
-                    className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-[10px] text-white flex items-center justify-center font-medium shadow-lg"
-                  >
+                  <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 300 }} className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-[10px] text-white flex items-center justify-center font-medium shadow-lg">
                     {unreadCount > 9 ? '9+' : unreadCount}
                   </motion.span>
                 )}
@@ -166,47 +142,32 @@ export const Header = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-9 gap-1.5 px-2.5 text-muted-foreground hover:text-foreground hover:bg-primary/10 rounded-xl"
-                >
+                <Button variant="ghost" size="sm" className="h-9 gap-1.5 px-2.5 text-muted-foreground hover:text-foreground hover:bg-primary/10 rounded-xl">
                   <Globe className="h-4 w-4" />
                   <span className="text-xs font-medium uppercase">{currentLang}</span>
                 </Button>
               </motion.div>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[120px] rounded-xl">
-              <DropdownMenuItem 
-                onClick={() => toggleLanguage('en')}
-                className={cn(
-                  'rounded-lg cursor-pointer',
-                  currentLang === 'en' && 'bg-primary/10 text-primary'
-                )}
-              >
-                🇬🇧 English
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => toggleLanguage('hi')}
-                className={cn(
-                  'rounded-lg cursor-pointer',
-                  currentLang === 'hi' && 'bg-primary/10 text-primary'
-                )}
-              >
-                🇮🇳 हिंदी
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="min-w-[160px] rounded-xl max-h-[320px] overflow-y-auto">
+              {languages.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.code}
+                  onClick={() => toggleLanguage(lang.code)}
+                  className={cn(
+                    'rounded-lg cursor-pointer',
+                    currentLang === lang.code && 'bg-primary/10 text-primary'
+                  )}
+                >
+                  {lang.flag} {lang.label}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
 
           {/* Auth / Profile */}
           {user ? (
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-xl p-0 overflow-hidden hover:ring-2 hover:ring-primary/30"
-                onClick={() => navigate('/profile')}
-              >
+              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl p-0 overflow-hidden hover:ring-2 hover:ring-primary/30" onClick={() => navigate('/profile')}>
                 <div className="h-full w-full rounded-xl bg-gradient-to-br from-primary via-primary to-primary/80 flex items-center justify-center relative">
                   <User className="h-4 w-4 text-primary-foreground" />
                   <span className="absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full bg-green-500 ring-2 ring-background" />
@@ -215,11 +176,7 @@ export const Header = () => {
             </motion.div>
           ) : (
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                size="sm"
-                className="h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25"
-                onClick={() => navigate('/login')}
-              >
+              <Button size="sm" className="h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-lg shadow-primary/25" onClick={() => navigate('/login')}>
                 <LogIn className="h-4 w-4 mr-1" />
                 {t('auth.login')}
               </Button>

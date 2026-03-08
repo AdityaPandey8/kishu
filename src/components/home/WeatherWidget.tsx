@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Cloud, Droplets, Wind, Sun, Search, Loader2, CloudRain, CloudSun } from 'lucide-react';
+import { Cloud, Droplets, Wind, Sun, Search, Loader2, CloudRain, CloudSun, Mic } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 
 interface WeatherData {
   location: string;
@@ -22,7 +23,7 @@ export const WeatherWidget = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const fetchWeather = async (loc: string) => {
+  const fetchWeather = useCallback(async (loc: string) => {
     setLoading(true);
     setError('');
     try {
@@ -39,7 +40,14 @@ export const WeatherWidget = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  const { isListening, startListening, stopListening, supported } = useVoiceSearch({
+    onResult: (transcript) => {
+      setSearchInput(transcript);
+      fetchWeather(transcript.trim());
+    },
+  });
 
   useEffect(() => {
     fetchWeather(location);
@@ -72,7 +80,6 @@ export const WeatherWidget = () => {
       className="rounded-2xl gradient-earth p-4 shadow-soft"
       style={{ transformPerspective: 1000 }}
     >
-      {/* Search bar */}
       <form onSubmit={handleSearch} className="flex items-center gap-2 mb-3">
         <div className="relative flex-1">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
@@ -84,6 +91,17 @@ export const WeatherWidget = () => {
             className="w-full h-8 pl-7 pr-2 text-xs rounded-lg border border-border bg-background/80 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
+        {supported && (
+          <button
+            type="button"
+            onClick={isListening ? stopListening : startListening}
+            className={`h-8 w-8 flex items-center justify-center rounded-lg border transition-colors ${
+              isListening ? 'bg-destructive text-destructive-foreground border-destructive animate-pulse' : 'border-border bg-background/80 text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Mic className="h-3.5 w-3.5" />
+          </button>
+        )}
         <button type="submit" className="h-8 px-3 text-xs rounded-lg bg-primary text-primary-foreground font-medium">
           Go
         </button>
@@ -108,7 +126,6 @@ export const WeatherWidget = () => {
             </div>
             <span className="text-xs text-muted-foreground">{weather.location}</span>
           </div>
-
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <motion.div animate={{ x: [0, 5, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}>
@@ -119,7 +136,6 @@ export const WeatherWidget = () => {
                 <div className="text-xs text-muted-foreground">{weather.current.condition}</div>
               </div>
             </div>
-
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Droplets className="h-3.5 w-3.5" />
