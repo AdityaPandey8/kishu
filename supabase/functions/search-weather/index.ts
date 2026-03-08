@@ -25,9 +25,33 @@ serve(async (req) => {
     }
 
     const url = `https://wttr.in/${encodeURIComponent(query)}?format=j1`;
-    const res = await fetch(url, {
-      headers: { "User-Agent": "curl/7.68.0" },
-    });
+
+    let res: Response | null = null;
+    let lastError: unknown;
+
+    // Retry up to 3 times — wttr.in sometimes fails with HTTP/2 stream errors
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        res = await fetch(url, {
+          headers: { "User-Agent": "curl/7.68.0", "Accept": "application/json" },
+        });
+        if (res.ok) break;
+        // Non-OK but no network error — don't retry
+        break;
+      } catch (err) {
+        lastError = err;
+        // Wait briefly before retrying
+        await new Promise((r) => setTimeout(r, 500 * (attempt + 1)));
+      }
+    }
+
+    if (!res) {
+      console.error("wttr.in unreachable after retries:", lastError);
+      return new Response(JSON.stringify({ error: "Weather service temporarily unavailable. Please try again." }), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     if (!res.ok) {
       const text = await res.text();
