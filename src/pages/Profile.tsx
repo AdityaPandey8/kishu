@@ -79,6 +79,7 @@ const Profile = () => {
       { icon: FileText, label: 'GST', value: kycData?.gstNumber || 'Not submitted' },
       { icon: Store, label: isHindi ? 'व्यवसाय प्रकार' : 'Business Type', value: kycData?.businessType ? kycData.businessType.charAt(0).toUpperCase() + kycData.businessType.slice(1) : 'Not set' },
       { icon: Users, label: isHindi ? 'ग्राहक' : 'Customers', value: dealerCustomers.length.toString() },
+      ...(user?.operatingHours ? [{ icon: Clock, label: isHindi ? 'कार्य समय' : 'Hours', value: `${user.operatingHours.open} – ${user.operatingHours.close} (${user.operatingHours.days.join(', ')})` }] : []),
     ];
 
     const quickActions = [
