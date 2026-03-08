@@ -10,7 +10,11 @@ import { SeasonalCalendar } from '@/components/home/SeasonalCalendar';
 import { ExpertHelp } from '@/components/home/ExpertHelp';
 import { CropGuide } from '@/components/home/CropGuide';
 import { WeatherAlertsWidget } from '@/components/home/WeatherAlertsWidget';
+import { AppSuggests } from '@/components/home/AppSuggests';
 import { useAuth } from '@/contexts/AuthContext';
+import { lazy, Suspense } from 'react';
+
+const FarmingChatbot = lazy(() => import('@/components/chat/FarmingChatbot'));
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -61,6 +65,9 @@ const FarmerDashboard = () => {
         {/* Seasonal Calendar */}
         <SeasonalCalendar />
 
+        {/* App Suggests */}
+        <AppSuggests />
+
         {/* Expert Help */}
         <ExpertHelp />
 
@@ -70,6 +77,9 @@ const FarmerDashboard = () => {
         {/* Recent Diagnoses */}
         <RecentDiagnoses />
       </motion.div>
+      <Suspense fallback={null}>
+        <FarmingChatbot />
+      </Suspense>
     </AppLayout>
   );
 };
