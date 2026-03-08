@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { 
   Shield, Users, Store, Package, TrendingUp, 
-  CheckCircle, Clock, ChevronRight, 
+  Clock, ChevronRight, 
   Activity, BarChart3, ShoppingBag, MessageSquare,
-  AlertTriangle, FileText, Eye, Truck, XCircle
+  AlertTriangle, FileText, Eye, Truck
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const AdminDashboard = () => {
-  const { t, i18n } = useTranslation();
+  const { i18n } = useTranslation();
   const { user } = useAuth();
   const { 
     platformUsers, products, orders, inquiries, 
@@ -79,7 +79,7 @@ const AdminDashboard = () => {
     initial: { opacity: 0, y: 24 },
     whileInView: { opacity: 1, y: 0 },
     viewport: { once: true, margin: '-40px' },
-    transition: { type: 'spring', stiffness: 100, damping: 20 },
+    transition: { type: 'spring' as const, stiffness: 100, damping: 20 },
   };
 
   return (
