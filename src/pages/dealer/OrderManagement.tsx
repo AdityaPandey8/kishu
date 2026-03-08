@@ -73,12 +73,12 @@ const OrderManagement = () => {
     >
       {/* Buyer Details */}
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5">
           <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
             <UserIcon className="h-4 w-4 text-muted-foreground" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-foreground">{inquiry.farmerName}</p>
+            <p className="text-sm font-semibold text-foreground cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(`/buyer/${inquiry.farmerId}`)}>{inquiry.farmerName}</p>
             <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
               <MapPin className="h-3 w-3" />
               {inquiry.location}
