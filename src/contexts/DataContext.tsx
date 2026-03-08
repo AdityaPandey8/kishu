@@ -191,6 +191,13 @@ export interface Post {
   likes: string[];
   comments: Comment[];
   createdAt: string;
+  type: 'text' | 'image' | 'short-video' | 'long-video';
+  imageUrl?: string;
+  videoUrl?: string;
+  thumbnailUrl?: string;
+  videoDuration?: number;
+  saves: string[];
+  shares: number;
 }
 
 export interface Comment {
@@ -283,7 +290,7 @@ interface DataContextType {
   
   // Posts
   posts: Post[];
-  addPost: (post: Omit<Post, 'id' | 'likes' | 'comments' | 'createdAt'>) => void;
+  addPost: (post: Omit<Post, 'id' | 'likes' | 'comments' | 'createdAt' | 'saves' | 'shares'>) => void;
   toggleLike: (postId: string, userId: string) => void;
   addComment: (postId: string, comment: Omit<Comment, 'id' | 'createdAt'>) => void;
   deletePost: (id: string) => void;
@@ -369,6 +376,12 @@ interface DataContextType {
   toggleSaveReel: (reelId: string) => void;
   isSavedReel: (reelId: string) => boolean;
 
+  // Saved Posts
+  savedPosts: string[];
+  toggleSavePost: (postId: string) => void;
+  isSavedPost: (postId: string) => boolean;
+  incrementPostShares: (postId: string) => void;
+
   // Tracked Crops (Market Prices)
   trackedCrops: TrackedCrop[];
   trackCrop: (crop: Omit<TrackedCrop, 'id' | 'createdAt'>) => void;
@@ -431,9 +444,12 @@ const seedInquiries: Inquiry[] = [
 ];
 
 const seedPosts: Post[] = [
-  { id: 'post1', authorId: 'farmer-001', authorName: 'Ramesh Kumar', location: 'Jaipur, RJ', content: 'My wheat crop is showing yellow spots on leaves. Any suggestions?', contentHi: 'मेरी गेहूं की फसल में पत्तियों पर पीले धब्बे दिख रहे हैं। कोई सुझाव?', tags: ['Wheat', 'Disease'], likes: ['f2', 'f3'], comments: [], createdAt: new Date().toISOString() },
-  { id: 'post2', authorId: 'f2', authorName: 'Sunita Devi', location: 'Lucknow, UP', content: 'Successfully treated tomato blight using neem oil spray! Sharing my experience.', contentHi: 'नीम तेल स्प्रे से टमाटर के ब्लाइट का सफल इलाज किया!', tags: ['Tomato', 'Success Story'], likes: ['farmer-001', 'f3', 'f4'], comments: [], createdAt: new Date().toISOString() },
-  { id: 'post3', authorId: 'f3', authorName: 'Mohan Singh', location: 'Bhopal, MP', content: 'What is the best time to sow mustard in central India this year?', contentHi: 'इस साल मध्य भारत में सरसों बोने का सबसे अच्छा समय क्या है?', tags: ['Mustard', 'Question'], likes: [], comments: [], createdAt: new Date().toISOString() },
+  { id: 'post1', authorId: 'creator-001', authorName: 'Kisan Vikas', location: 'Punjab', content: 'My wheat crop is showing yellow spots on leaves. Any suggestions?', contentHi: 'मेरी गेहूं की फसल में पत्तियों पर पीले धब्बे दिख रहे हैं। कोई सुझाव?', tags: ['Wheat', 'Disease'], likes: ['f2', 'f3'], comments: [{ id: 'pc1', authorId: 'f2', authorName: 'Sunita Devi', content: 'Try neem oil spray!', createdAt: new Date().toISOString() }], createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), type: 'text', saves: ['farmer-001'], shares: 3 },
+  { id: 'post2', authorId: 'creator-002', authorName: 'Organic Farming India', location: 'Maharashtra', content: 'Successfully treated tomato blight using neem oil spray! Sharing my experience.', contentHi: 'नीम तेल स्प्रे से टमाटर के ब्लाइट का सफल इलाज किया!', tags: ['Tomato', 'Success Story'], likes: ['farmer-001', 'f3', 'f4'], comments: [], createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(), type: 'image', imageUrl: 'https://images.unsplash.com/photo-1592921870789-04563d55041c?w=600', saves: ['f2'], shares: 12 },
+  { id: 'post3', authorId: 'creator-003', authorName: 'Modern Kheti', location: 'Haryana', content: 'Complete guide to organic composting at home - watch this detailed tutorial!', contentHi: 'घर पर जैविक खाद बनाने की पूरी गाइड - यह विस्तृत ट्यूटोरियल देखें!', tags: ['Organic', 'Tutorial'], likes: ['farmer-001', 'f2', 'f3', 'f4', 'f5'], comments: [{ id: 'pc2', authorId: 'farmer-001', authorName: 'Ramesh Kumar', content: 'Amazing tutorial!', createdAt: new Date().toISOString() }], createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), type: 'long-video', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4', thumbnailUrl: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600', videoDuration: 596, saves: ['farmer-001', 'f3'], shares: 45 },
+  { id: 'post4', authorId: 'creator-001', authorName: 'Kisan Vikas', location: 'Punjab', content: 'Quick tip: How to identify nitrogen deficiency in your crops 🌱', contentHi: 'त्वरित सुझाव: अपनी फसलों में नाइट्रोजन की कमी की पहचान कैसे करें 🌱', tags: ['Tips', 'Nutrient'], likes: ['f2'], comments: [], createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), type: 'short-video', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4', thumbnailUrl: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400', videoDuration: 32, saves: [], shares: 8 },
+  { id: 'post5', authorId: 'creator-002', authorName: 'Organic Farming India', location: 'Maharashtra', content: 'Drip irrigation system installation - A complete guide for small farmers', contentHi: 'ड्रिप सिंचाई प्रणाली स्थापना - छोटे किसानों के लिए एक पूर्ण गाइड', tags: ['Irrigation', 'Guide'], likes: ['farmer-001', 'f3', 'f4'], comments: [{ id: 'pc3', authorId: 'f3', authorName: 'Mohan Singh', content: 'Very helpful, thank you!', createdAt: new Date().toISOString() }], createdAt: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), type: 'long-video', videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4', thumbnailUrl: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600', videoDuration: 653, saves: ['farmer-001'], shares: 34 },
+  { id: 'post6', authorId: 'creator-003', authorName: 'Modern Kheti', location: 'Haryana', content: 'Look at my wheat harvest this season! Record production achieved with proper soil management.', contentHi: 'इस सीज़न में मेरी गेहूं की फसल देखें! उचित मिट्टी प्रबंधन से रिकॉर्ड उत्पादन हासिल किया।', tags: ['Wheat', 'Success Story'], likes: ['farmer-001', 'f2', 'f5'], comments: [], createdAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(), type: 'image', imageUrl: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=600', saves: ['f2', 'f4'], shares: 22 },
 ];
 
 const seedNotifications: Notification[] = [
@@ -723,6 +739,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [subscriptions, setSubscriptions] = useLocalStorage<Subscription[]>('kishu-subscriptions', seedSubscriptions);
   const [creatorProfiles, setCreatorProfiles] = useLocalStorage<CreatorProfile[]>('kishu-creators', seedCreatorProfiles);
   const [savedReels, setSavedReels] = useLocalStorage<string[]>('kishu-saved-reels', []);
+  const [savedPosts, setSavedPosts] = useLocalStorage<string[]>('kishu-saved-posts', []);
   const [trackedCrops, setTrackedCrops] = useLocalStorage<TrackedCrop[]>('kishu-tracked-crops', []);
   const [expertApplications, setExpertApplications] = useLocalStorage<ExpertApplication[]>('kishu-expert-applications', seedExpertApplications);
   const [dealerKYCs, setDealerKYCs] = useLocalStorage<DealerKYC[]>('kishu-dealer-kycs', seedDealerKYCs);
@@ -786,12 +803,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, [setInquiries]);
 
   // Posts
-  const addPost = useCallback((post: Omit<Post, 'id' | 'likes' | 'comments' | 'createdAt'>) => {
+  const addPost = useCallback((post: Omit<Post, 'id' | 'likes' | 'comments' | 'createdAt' | 'saves' | 'shares'>) => {
     const newPost: Post = {
       ...post,
       id: `post${Date.now()}`,
       likes: [],
       comments: [],
+      saves: [],
+      shares: 0,
       createdAt: new Date().toISOString(),
     };
     setPosts(prev => [newPost, ...prev]);
@@ -1168,6 +1187,25 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return savedReels.includes(reelId);
   }, [savedReels]);
 
+  // Saved Posts
+  const toggleSavePost = useCallback((postId: string) => {
+    setSavedPosts(prev => 
+      prev.includes(postId) 
+        ? prev.filter(id => id !== postId)
+        : [...prev, postId]
+    );
+  }, [setSavedPosts]);
+
+  const isSavedPost = useCallback((postId: string) => {
+    return savedPosts.includes(postId);
+  }, [savedPosts]);
+
+  const incrementPostShares = useCallback((postId: string) => {
+    setPosts(prev => prev.map(p => 
+      p.id === postId ? { ...p, shares: p.shares + 1 } : p
+    ));
+  }, [setPosts]);
+
   // Tracked Crops
   const trackCrop = useCallback((crop: Omit<TrackedCrop, 'id' | 'createdAt'>) => {
     const newCrop: TrackedCrop = {
@@ -1269,6 +1307,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       subscriptions, subscribe, unsubscribe, isSubscribed, getSubscriberCount, getSubscribedCreators,
       creatorProfiles, becomeCreator, updateCreatorProfile, getCreatorProfile, isCreator,
       savedReels, toggleSaveReel, isSavedReel,
+      savedPosts, toggleSavePost, isSavedPost, incrementPostShares,
       trackedCrops, trackCrop, untrackCrop, isTrackedCrop,
       expertApplications, applyForExpert, approveExpert, rejectExpert, getExpertApplication,
       dealerKYCs, submitDealerKYC, approveDealerKYC, rejectDealerKYC, getDealerKYC,
