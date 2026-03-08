@@ -56,7 +56,7 @@ export const UrgentInquiries = ({
 
       <div className="space-y-2">
         {pending.slice(0, 2).map((inquiry, index) => {
-          const config = typeConfig[inquiry.type];
+          const config = typeConfig[inquiry.type] || typeConfig.general;
           const TypeIcon = config.icon;
           return (
             <motion.div

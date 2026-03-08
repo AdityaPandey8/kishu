@@ -180,7 +180,7 @@ const Inquiries = () => {
           <div className="space-y-3">
             {filteredInquiries.map((inquiry, index) => {
               const status = statusConfig[inquiry.status];
-              const type = typeConfig[inquiry.type];
+              const type = typeConfig[inquiry.type] || typeConfig.general;
               const StatusIcon = status.icon;
               const TypeIcon = type.icon;
 
