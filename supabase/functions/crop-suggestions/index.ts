@@ -14,7 +14,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const prompt = `Suggest 5 crops/plants ideal for planting in ${season} season in ${location || "India"}. For each crop provide: name, local name in ${language || "Hindi"}, short description, step-by-step planting method, required tools/products for planting, best months to plant, and difficulty level.`;
+    const prompt = `Suggest 5 crops/plants ideal for planting in ${season} season in ${location || "India"}. For each crop provide: name, local name in ${language || "Hindi"}, short description, step-by-step planting method, care tips after planting (watering, fertilization, pest management), required tools/products/pesticides for planting and care, best months to plant, and difficulty level.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -49,6 +49,7 @@ serve(async (req) => {
                         nameLocal: { type: "string", description: "Crop name in local language" },
                         description: { type: "string", description: "Brief description (1-2 sentences)" },
                         plantingMethod: { type: "string", description: "Step-by-step planting method (3-5 steps)" },
+                        careTips: { type: "string", description: "Care tips after planting: watering schedule, fertilization, pest management (3-5 tips)" },
                         requiredTools: {
                           type: "array",
                           items: {
@@ -64,7 +65,7 @@ serve(async (req) => {
                         bestMonths: { type: "string", description: "Best months to plant" },
                         difficulty: { type: "string", enum: ["Easy", "Medium", "Hard"] },
                       },
-                      required: ["name", "nameLocal", "description", "plantingMethod", "requiredTools", "bestMonths", "difficulty"],
+                      required: ["name", "nameLocal", "description", "plantingMethod", "careTips", "requiredTools", "bestMonths", "difficulty"],
                       additionalProperties: false,
                     },
                   },
