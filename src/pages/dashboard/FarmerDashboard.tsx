@@ -2,11 +2,10 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { QuickScanCard } from '@/components/home/QuickScanCard';
-import { TipsCarousel } from '@/components/home/TipsCarousel';
 import { WeatherWidget } from '@/components/home/WeatherWidget';
 import { RecentDiagnoses } from '@/components/home/RecentDiagnoses';
 import { MarketPrices } from '@/components/home/MarketPrices';
-import { SeasonalCalendar } from '@/components/home/SeasonalCalendar';
+
 import { ExpertHelp } from '@/components/home/ExpertHelp';
 import { CropGuide } from '@/components/home/CropGuide';
 import { WeatherAlertsWidget } from '@/components/home/WeatherAlertsWidget';
@@ -59,11 +58,6 @@ const FarmerDashboard = () => {
           <MarketPrices />
         </div>
 
-        {/* Tips Carousel */}
-        <TipsCarousel />
-
-        {/* Seasonal Calendar */}
-        <SeasonalCalendar />
 
         {/* App Suggests */}
         <AppSuggests />

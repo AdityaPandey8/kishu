@@ -1,14 +1,13 @@
 
 
-# Remove Tips Carousel and Seasonal Calendar from Farmer Dashboard
+# Show Login Page Instead of Farmer Dashboard for Guests
 
-## Changes
+## Change
+In `src/pages/Index.tsx`, when no user is logged in, redirect to `/auth` instead of showing `FarmerDashboard`.
 
-### Edit `src/pages/dashboard/FarmerDashboard.tsx`
-- Remove imports for `TipsCarousel` and `SeasonalCalendar`
-- Remove `<TipsCarousel />` and `<SeasonalCalendar />` JSX from the dashboard
+## Edit
+**File: `src/pages/Index.tsx`** (line 22)
+- Replace `return <FarmerDashboard />;` with `return <Navigate to="/auth" replace />;`
 
-### Delete files (optional cleanup)
-- `src/components/home/TipsCarousel.tsx`
-- `src/components/home/SeasonalCalendar.tsx`
+This ensures unauthenticated users always see the role-selection auth landing page first.
 
