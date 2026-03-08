@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Heart, Share2, Bookmark, Send,
-  Clock, UserPlus, UserCheck, Film
+  Clock, UserPlus, UserCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,7 +53,7 @@ const CommunityVideo = () => {
     );
   }
 
-  const creator = creatorProfiles.find(c => c.userId === post.authorId);
+  
   const isLiked = user ? post.likes.includes(user.id) : false;
   const isSaved = isSavedPost(post.id);
   const following = user ? isSubscribed(post.authorId, user.id) : false;
@@ -142,7 +142,7 @@ const CommunityVideo = () => {
               className={cn('rounded-full', !following && 'gradient-kishu')}
               onClick={() => {
                 if (!user) { toast.error('Please login first'); return; }
-                following ? unsubscribe(post.authorId, user.id) : subscribe(post.authorId, user.id);
+                if (following) { unsubscribe(post.authorId, user.id); } else { subscribe(post.authorId, user.id); }
               }}
             >
               {following ? <UserCheck className="h-4 w-4 mr-1" /> : <UserPlus className="h-4 w-4 mr-1" />}
