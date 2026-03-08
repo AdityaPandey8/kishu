@@ -30,13 +30,25 @@ async function fetchWttrData(query: string) {
         headers: { "User-Agent": "curl/7.68.0", "Accept": "application/json" },
       });
 
+      const text = await res.text();
+      let parsed: any = null;
+
+      try {
+        parsed = JSON.parse(text);
+      } catch {
+        // non-JSON response from upstream
+      }
+
+      // wttr.in can return non-2xx for some location formats but still include usable weather JSON
+      if (parsed?.current_condition?.[0]) {
+        return parsed;
+      }
+
       if (!res.ok) {
-        const text = await res.text();
         throw new Error(`wttr.in returned ${res.status}: ${text.slice(0, 200)}`);
       }
 
-      const text = await res.text();
-      return JSON.parse(text);
+      throw new Error("wttr.in returned unexpected response format");
     } catch (err) {
       lastError = err;
       if (attempt < 2) await sleep(450 * (attempt + 1));
