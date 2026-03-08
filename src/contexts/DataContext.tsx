@@ -401,6 +401,12 @@ interface DataContextType {
   approveDealerKYC: (kycId: string, dealerId: string, adminId: string) => void;
   rejectDealerKYC: (kycId: string, dealerId: string, adminId: string, reason: string) => void;
   getDealerKYC: (dealerId: string) => DealerKYC | undefined;
+
+  // Wishlist
+  wishlist: string[];
+  toggleWishlist: (productId: string) => void;
+  isWishlisted: (productId: string) => boolean;
+  getWishlistProducts: () => Product[];
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -743,6 +749,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [trackedCrops, setTrackedCrops] = useLocalStorage<TrackedCrop[]>('kishu-tracked-crops', []);
   const [expertApplications, setExpertApplications] = useLocalStorage<ExpertApplication[]>('kishu-expert-applications', seedExpertApplications);
   const [dealerKYCs, setDealerKYCs] = useLocalStorage<DealerKYC[]>('kishu-dealer-kycs', seedDealerKYCs);
+  const [wishlist, setWishlist] = useLocalStorage<string[]>('kishu-wishlist', []);
 
 
   // Diagnoses
@@ -1290,6 +1297,23 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return dealerKYCs.find(kyc => kyc.dealerId === dealerId);
   }, [dealerKYCs]);
 
+  // Wishlist
+  const toggleWishlist = useCallback((productId: string) => {
+    setWishlist(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  }, [setWishlist]);
+
+  const isWishlisted = useCallback((productId: string) => {
+    return wishlist.includes(productId);
+  }, [wishlist]);
+
+  const getWishlistProducts = useCallback(() => {
+    return products.filter(p => wishlist.includes(p.id));
+  }, [products, wishlist]);
+
   return (
     <DataContext.Provider value={{
       diagnoses, addDiagnosis, deleteDiagnosis, toggleBookmark,
@@ -1311,6 +1335,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       trackedCrops, trackCrop, untrackCrop, isTrackedCrop,
       expertApplications, applyForExpert, approveExpert, rejectExpert, getExpertApplication,
       dealerKYCs, submitDealerKYC, approveDealerKYC, rejectDealerKYC, getDealerKYC,
+      wishlist, toggleWishlist, isWishlisted, getWishlistProducts,
     }}>
       {children}
     </DataContext.Provider>
