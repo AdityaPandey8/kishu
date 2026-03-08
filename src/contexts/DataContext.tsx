@@ -172,11 +172,13 @@ export interface Inquiry {
   farmerId: string;
   farmerName: string;
   dealerId: string;
-  crop: string;
-  issue: string;
+  type: 'stock' | 'delivery' | 'general';
+  subject: string;
+  message: string;
   location: string;
   status: 'pending' | 'responded' | 'resolved';
-  urgent: boolean;
+  orderId?: string;
+  productName?: string;
   createdAt: string;
   response?: string;
 }
@@ -461,11 +463,11 @@ const seedProducts: Product[] = [
 ];
 
 const seedInquiries: Inquiry[] = [
-  { id: 'i1', farmerId: 'farmer-001', farmerName: 'Ramesh Kumar', dealerId: 'dealer-001', crop: 'Tomato - Early Blight', issue: 'Need fungicide recommendation', location: 'Jaipur, RJ', status: 'pending', urgent: true, createdAt: new Date().toISOString() },
-  { id: 'i2', farmerId: 'f2', farmerName: 'Sunil Yadav', dealerId: 'dealer-001', crop: 'Rice - Leaf Rust', issue: 'Looking for organic solution', location: 'Lucknow, UP', status: 'pending', urgent: false, createdAt: new Date().toISOString() },
-  { id: 'i3', farmerId: 'f3', farmerName: 'Priya Sharma', dealerId: 'dealer-001', crop: 'Cotton - Pest Attack', issue: 'Urgent pest control needed', location: 'Ahmedabad, GJ', status: 'responded', urgent: true, createdAt: new Date().toISOString(), response: 'Recommended Imidacloprid spray' },
-  { id: 'i4', farmerId: 'f4', farmerName: 'Mohan Singh', dealerId: 'dealer-001', crop: 'Wheat - Nutrient Deficiency', issue: 'Yellowing leaves', location: 'Bhopal, MP', status: 'resolved', urgent: false, createdAt: new Date().toISOString() },
-  { id: 'i5', farmerId: 'f5', farmerName: 'Geeta Devi', dealerId: 'dealer-001', crop: 'Potato - Late Blight', issue: 'Spreading disease', location: 'Patna, BR', status: 'resolved', urgent: true, createdAt: new Date().toISOString() },
+  { id: 'i1', farmerId: 'farmer-001', farmerName: 'Ramesh Kumar', dealerId: 'dealer-001', type: 'stock', subject: 'Is NPK 19-19-19 available?', message: 'I need 10 bags of NPK 19-19-19 fertilizer for my tomato field. Is it in stock?', productName: 'NPK 19-19-19', location: 'Jaipur, RJ', status: 'pending', createdAt: new Date().toISOString() },
+  { id: 'i2', farmerId: 'f2', farmerName: 'Sunil Yadav', dealerId: 'dealer-001', type: 'delivery', subject: 'Where is my order #ord1?', message: 'I placed an order 3 days ago but haven\'t received any shipping update yet.', orderId: 'ord1', location: 'Lucknow, UP', status: 'pending', createdAt: new Date().toISOString() },
+  { id: 'i3', farmerId: 'f3', farmerName: 'Priya Sharma', dealerId: 'dealer-001', type: 'stock', subject: 'Neem Oil bulk availability', message: 'Do you have Neem Oil in bulk? I need 20 liters for my cotton farm.', productName: 'Neem Oil Organic', location: 'Ahmedabad, GJ', status: 'responded', createdAt: new Date().toISOString(), response: 'Yes, we have 20L packs available at ₹280/L. I can arrange delivery by tomorrow.' },
+  { id: 'i4', farmerId: 'f4', farmerName: 'Mohan Singh', dealerId: 'dealer-001', type: 'delivery', subject: 'Order delivered but items missing', message: 'My order was delivered but 2 bags of Urea were missing from the package.', orderId: 'ord4', location: 'Bhopal, MP', status: 'resolved', createdAt: new Date().toISOString(), response: 'We have dispatched the missing items. Should arrive by tomorrow.' },
+  { id: 'i5', farmerId: 'f5', farmerName: 'Geeta Devi', dealerId: 'dealer-001', type: 'general', subject: 'Product recommendation for potato crop', message: 'Can you suggest the best fungicide for potato late blight? Budget is around ₹500.', location: 'Patna, BR', status: 'resolved', createdAt: new Date().toISOString(), response: 'I recommend Mancozeb 75% WP at ₹450. Very effective for late blight.' },
 ];
 
 const seedPosts: Post[] = [
@@ -872,7 +874,18 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       createdAt: new Date().toISOString(),
     };
     setInquiries(prev => [newInquiry, ...prev]);
-  }, [setInquiries]);
+
+    // Auto-notify the dealer
+    const typeLabel = inquiry.type === 'stock' ? 'Stock' : inquiry.type === 'delivery' ? 'Delivery' : 'General';
+    addNotification({
+      userId: inquiry.dealerId,
+      type: 'inquiry',
+      title: `New ${typeLabel} Inquiry`,
+      message: `${inquiry.farmerName}: ${inquiry.subject}`,
+      link: '/inquiries',
+    });
+    toast.info(`New inquiry from ${inquiry.farmerName}`);
+  }, [setInquiries, addNotification]);
 
   const updateInquiryStatus = useCallback((id: string, status: Inquiry['status'], response?: string) => {
     setInquiries(prev => prev.map(i => 
@@ -1085,10 +1098,37 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, [setOrders]);
 
   const updateOrderStatus = useCallback((orderId: string, status: Order['status']) => {
-    setOrders(prev => prev.map(o => 
-      o.id === orderId ? { ...o, status, updatedAt: new Date().toISOString() } : o
-    ));
-  }, [setOrders]);
+    setOrders(prev => {
+      const order = prev.find(o => o.id === orderId);
+      if (order) {
+        const statusLabels: Record<string, string> = {
+          confirmed: 'Order Confirmed',
+          shipped: 'Order Shipped',
+          delivered: 'Order Delivered',
+          cancelled: 'Order Cancelled',
+        };
+        // Notify farmer
+        addNotification({
+          userId: order.farmerId,
+          type: 'order',
+          title: statusLabels[status] || 'Order Updated',
+          message: `Your order #${order.id.slice(-4)} has been ${status}.`,
+          link: '/my-orders',
+        });
+        // Notify dealer
+        addNotification({
+          userId: order.dealerId,
+          type: 'order',
+          title: statusLabels[status] || 'Order Updated',
+          message: `Order #${order.id.slice(-4)} for ${order.farmerName} is now ${status}.`,
+          link: '/dealer/orders',
+        });
+      }
+      return prev.map(o => 
+        o.id === orderId ? { ...o, status, updatedAt: new Date().toISOString() } : o
+      );
+    });
+  }, [setOrders, addNotification]);
 
   const getOrdersByFarmer = useCallback((farmerId: string) => {
     return orders.filter(o => o.farmerId === farmerId);
