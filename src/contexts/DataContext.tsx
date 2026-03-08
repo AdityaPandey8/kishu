@@ -449,6 +449,14 @@ const seedProducts: Product[] = [
   { id: 'p8', dealerId: 'dealer-001', name: 'Micronutrient Mix', category: 'Fertilizer', price: 280, stock: 110, description: 'Essential micronutrients blend', sales: 63, createdAt: 'Jan 1, 2026', rating: 4.7, reviews: 38 },
   { id: 'p9', dealerId: 'd2', name: 'Trichoderma Bio', category: 'Organic', price: 350, stock: 60, description: 'Biological fungicide for root health', sales: 25, createdAt: 'Jan 5, 2026', rating: 4.9, reviews: 41 },
   { id: 'p10', dealerId: 'd2', name: 'Vermicompost Premium', category: 'Organic', price: 450, stock: 200, description: 'Organic soil enrichment', sales: 88, createdAt: 'Jan 5, 2026', rating: 4.8, reviews: 56 },
+  { id: 'plant-1', dealerId: 'd2', name: 'Tulsi (Holy Basil) Plant', category: 'Plants', price: 149, stock: 80, description: 'Fresh Tulsi plant from Organic Green Nursery. Medicinal & aromatic herb for every home garden.', sales: 65, createdAt: 'Jan 10, 2026', rating: 4.8, reviews: 42 },
+  { id: 'plant-2', dealerId: 'd2', name: 'Money Plant (Golden Pothos)', category: 'Plants', price: 199, stock: 120, description: 'Low-maintenance indoor plant from Green Valley Nursery. Purifies air naturally.', sales: 92, createdAt: 'Jan 10, 2026', rating: 4.7, reviews: 58 },
+  { id: 'plant-3', dealerId: 'dealer-001', name: 'Aloe Vera Plant', category: 'Plants', price: 129, stock: 95, description: 'Healthy Aloe Vera from Sunshine Nursery. Great for skincare and medicinal use.', sales: 74, createdAt: 'Jan 12, 2026', rating: 4.6, reviews: 35 },
+  { id: 'plant-4', dealerId: 'dealer-001', name: 'Curry Leaf Plant', category: 'Plants', price: 249, stock: 45, description: 'Aromatic curry leaf plant from Desi Nursery. Essential for Indian cooking.', sales: 53, createdAt: 'Jan 12, 2026', rating: 4.9, reviews: 31 },
+  { id: 'plant-5', dealerId: 'd2', name: 'Rose Plant (Red Hybrid)', category: 'Plants', price: 299, stock: 60, description: 'Premium hybrid rose from Flora Nursery. Blooms year-round with proper care.', sales: 48, createdAt: 'Jan 14, 2026', rating: 4.5, reviews: 27 },
+  { id: 'plant-6', dealerId: 'dealer-001', name: 'Jasmine (Mogra) Plant', category: 'Plants', price: 199, stock: 55, description: 'Fragrant Mogra jasmine from Heritage Nursery. Perfect for pooja and gardens.', sales: 61, createdAt: 'Jan 14, 2026', rating: 4.8, reviews: 39 },
+  { id: 'plant-7', dealerId: 'd2', name: 'Mango Sapling (Alphonso)', category: 'Plants', price: 499, stock: 30, description: 'Grafted Alphonso mango sapling from Royal Nursery. Fruit-bearing in 3-4 years.', sales: 35, createdAt: 'Jan 15, 2026', rating: 4.7, reviews: 22 },
+  { id: 'plant-8', dealerId: 'dealer-001', name: 'Guava Sapling (Thai)', category: 'Plants', price: 349, stock: 40, description: 'High-yield Thai guava sapling from Kisan Nursery. Sweet fruit within 2 years.', sales: 29, createdAt: 'Jan 15, 2026', rating: 4.6, reviews: 18 },
 ];
 
 const seedInquiries: Inquiry[] = [
