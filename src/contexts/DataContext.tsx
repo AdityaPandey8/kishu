@@ -878,15 +878,19 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
     // Auto-notify the dealer
     const typeLabel = inquiry.type === 'stock' ? 'Stock' : inquiry.type === 'delivery' ? 'Delivery' : 'General';
-    addNotification({
+    const notif: Notification = {
+      id: `n${Date.now()}`,
       userId: inquiry.dealerId,
       type: 'inquiry',
       title: `New ${typeLabel} Inquiry`,
       message: `${inquiry.farmerName}: ${inquiry.subject}`,
       link: '/inquiries',
-    });
+      read: false,
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications(prev => [notif, ...prev]);
     toast.info(`New inquiry from ${inquiry.farmerName}`);
-  }, [setInquiries, addNotification]);
+  }, [setInquiries, setNotifications]);
 
   const updateInquiryStatus = useCallback((id: string, status: Inquiry['status'], response?: string) => {
     setInquiries(prev => prev.map(i => 
