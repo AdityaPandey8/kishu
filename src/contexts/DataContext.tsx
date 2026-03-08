@@ -409,7 +409,17 @@ interface DataContextType {
   getWishlistProducts: () => Product[];
 }
 
-const DataContext = createContext<DataContextType | undefined>(undefined);
+const globalDataContext = globalThis as typeof globalThis & {
+  __kishuDataContext?: ReturnType<typeof createContext<DataContextType | undefined>>;
+};
+
+const DataContext =
+  globalDataContext.__kishuDataContext ??
+  createContext<DataContextType | undefined>(undefined);
+
+if (!globalDataContext.__kishuDataContext) {
+  globalDataContext.__kishuDataContext = DataContext;
+}
 
 export const useData = () => {
   const context = useContext(DataContext);
