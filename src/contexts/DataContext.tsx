@@ -749,6 +749,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [trackedCrops, setTrackedCrops] = useLocalStorage<TrackedCrop[]>('kishu-tracked-crops', []);
   const [expertApplications, setExpertApplications] = useLocalStorage<ExpertApplication[]>('kishu-expert-applications', seedExpertApplications);
   const [dealerKYCs, setDealerKYCs] = useLocalStorage<DealerKYC[]>('kishu-dealer-kycs', seedDealerKYCs);
+  const [wishlist, setWishlist] = useLocalStorage<string[]>('kishu-wishlist', []);
 
 
   // Diagnoses
