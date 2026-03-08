@@ -40,7 +40,7 @@ export const InquiryDetailModal = ({
   const [showProducts, setShowProducts] = useState(false);
 
   const suggestedProducts = products.slice(0, 3);
-  const config = typeConfig[inquiry.type];
+  const config = typeConfig[inquiry.type] || typeConfig.general;
   const TypeIcon = config.icon;
 
   const handleSendResponse = () => {
