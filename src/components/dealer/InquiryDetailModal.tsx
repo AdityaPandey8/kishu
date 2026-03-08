@@ -2,13 +2,12 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   X, MapPin, Phone, MessageSquare, Clock, User, 
-  Leaf, AlertTriangle, CheckCircle, Send, Package,
-  Calendar, History, Star
+  CheckCircle, Send, Package, Truck, HelpCircle,
+  Calendar, History
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { Inquiry, Product } from '@/contexts/DataContext';
 import { formatDistanceToNow, format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -21,6 +20,12 @@ interface InquiryDetailModalProps {
   onResolve: (id: string) => void;
   onCall: (phone: string) => void;
 }
+
+const typeConfig = {
+  stock: { label: 'Stock', icon: Package, color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
+  delivery: { label: 'Delivery', icon: Truck, color: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' },
+  general: { label: 'General', icon: HelpCircle, color: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400' },
+};
 
 export const InquiryDetailModal = ({
   inquiry,
@@ -35,6 +40,8 @@ export const InquiryDetailModal = ({
   const [showProducts, setShowProducts] = useState(false);
 
   const suggestedProducts = products.slice(0, 3);
+  const config = typeConfig[inquiry.type];
+  const TypeIcon = config.icon;
 
   const handleSendResponse = () => {
     if (response.trim()) {
@@ -51,9 +58,9 @@ export const InquiryDetailModal = ({
   };
 
   const quickResponses = [
-    'Thank you for reaching out! I recommend the following products...',
-    'I have the perfect solution for your crop issue. Let me explain...',
-    'Based on the symptoms, this appears to be a fungal infection...',
+    'Thank you for reaching out! The item is currently in stock...',
+    'Your order has been shipped and is expected to arrive by...',
+    'I\'ll check the availability and get back to you shortly.',
   ];
 
   return (
@@ -72,13 +79,11 @@ export const InquiryDetailModal = ({
           </Button>
         </div>
 
-        {/* Status Badge */}
+        {/* Status & Type Badges */}
         <div className="flex items-center gap-2 mb-4">
-          {inquiry.urgent && (
-            <Badge variant="destructive" className="flex items-center gap-1">
-              <AlertTriangle className="h-3 w-3" /> Urgent
-            </Badge>
-          )}
+          <Badge variant="outline" className={cn('flex items-center gap-1', config.color)}>
+            <TypeIcon className="h-3 w-3" /> {config.label}
+          </Badge>
           <Badge variant={inquiry.status === 'resolved' ? 'default' : 'secondary'}>
             {inquiry.status.charAt(0).toUpperCase() + inquiry.status.slice(1)}
           </Badge>
@@ -125,66 +130,77 @@ export const InquiryDetailModal = ({
         {/* Request Details */}
         <div className="bg-card border border-border rounded-2xl p-4 mb-4 shadow-soft">
           <h4 className="font-medium text-foreground mb-2 flex items-center gap-2">
-            <Leaf className="h-4 w-4 text-primary" /> Crop Issue
+            <TypeIcon className="h-4 w-4 text-primary" /> {inquiry.subject}
           </h4>
-          <p className="text-sm font-medium text-foreground mb-1">{inquiry.crop}</p>
-          <p className="text-sm text-muted-foreground">{inquiry.issue}</p>
-        </div>
-
-        {/* Recommended Products */}
-        <div className="bg-card border border-border rounded-2xl p-4 mb-4 shadow-soft">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-foreground flex items-center gap-2">
-              <Package className="h-4 w-4 text-primary" /> Suggested Products
-            </h4>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowProducts(!showProducts)}
-              className="text-xs text-primary"
-            >
-              {showProducts ? 'Hide' : 'Show All'}
-            </Button>
-          </div>
-
-          <div className="space-y-2">
-            {(showProducts ? products : suggestedProducts).map((product) => (
-              <motion.div
-                key={product.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className={cn(
-                  'flex items-center gap-3 p-2 rounded-xl border transition-colors cursor-pointer',
-                  selectedProducts.includes(product.id)
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:bg-muted/50'
-                )}
-                onClick={() => toggleProduct(product.id)}
-              >
-                <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
-                  <Package className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
-                  <p className="text-xs text-muted-foreground">{product.category}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-semibold text-foreground">₹{product.price}</p>
-                  <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
-                </div>
-                {selectedProducts.includes(product.id) && (
-                  <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                )}
-              </motion.div>
-            ))}
-          </div>
-
-          {selectedProducts.length > 0 && (
-            <p className="text-xs text-primary mt-2">
-              {selectedProducts.length} product(s) selected
+          <p className="text-sm text-muted-foreground">{inquiry.message}</p>
+          {inquiry.productName && (
+            <p className="text-xs text-primary mt-2 flex items-center gap-1">
+              <Package className="h-3 w-3" /> Product: {inquiry.productName}
+            </p>
+          )}
+          {inquiry.orderId && (
+            <p className="text-xs text-primary mt-1 flex items-center gap-1">
+              <Truck className="h-3 w-3" /> Order: #{inquiry.orderId}
             </p>
           )}
         </div>
+
+        {/* Recommended Products */}
+        {inquiry.type === 'stock' && (
+          <div className="bg-card border border-border rounded-2xl p-4 mb-4 shadow-soft">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-medium text-foreground flex items-center gap-2">
+                <Package className="h-4 w-4 text-primary" /> Suggested Products
+              </h4>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowProducts(!showProducts)}
+                className="text-xs text-primary"
+              >
+                {showProducts ? 'Hide' : 'Show All'}
+              </Button>
+            </div>
+
+            <div className="space-y-2">
+              {(showProducts ? products : suggestedProducts).map((product) => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className={cn(
+                    'flex items-center gap-3 p-2 rounded-xl border transition-colors cursor-pointer',
+                    selectedProducts.includes(product.id)
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border hover:bg-muted/50'
+                  )}
+                  onClick={() => toggleProduct(product.id)}
+                >
+                  <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                    <Package className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
+                    <p className="text-xs text-muted-foreground">{product.category}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-foreground">₹{product.price}</p>
+                    <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
+                  </div>
+                  {selectedProducts.includes(product.id) && (
+                    <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
+                  )}
+                </motion.div>
+              ))}
+            </div>
+
+            {selectedProducts.length > 0 && (
+              <p className="text-xs text-primary mt-2">
+                {selectedProducts.length} product(s) selected
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Response Section */}
         {inquiry.status !== 'resolved' && (
@@ -207,7 +223,7 @@ export const InquiryDetailModal = ({
             </div>
 
             <Textarea
-              placeholder="Write your detailed response to the farmer..."
+              placeholder="Write your detailed response..."
               value={response}
               onChange={(e) => setResponse(e.target.value)}
               className="min-h-[120px] rounded-xl mb-3"

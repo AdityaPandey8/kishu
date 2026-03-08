@@ -465,8 +465,8 @@ const CustomerDetail = () => {
                       {formatDistanceToNow(new Date(inquiry.createdAt), { addSuffix: true })}
                     </span>
                   </div>
-                  <h4 className="font-medium text-foreground text-sm">{inquiry.crop}</h4>
-                  <p className="text-sm text-muted-foreground">{inquiry.issue}</p>
+                  <h4 className="font-medium text-foreground text-sm">{inquiry.subject}</h4>
+                  <p className="text-sm text-muted-foreground">{inquiry.message}</p>
                 </div>
               ))
             )}

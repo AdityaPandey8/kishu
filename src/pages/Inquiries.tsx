@@ -4,10 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, MessageSquare, Phone, MapPin, Clock, 
-  CheckCircle, AlertTriangle, Filter, Users
+  CheckCircle, Filter, Users, Package, Truck, HelpCircle
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { useData } from '@/contexts/DataContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -27,6 +28,12 @@ const statusConfig = {
   resolved: { label: 'Resolved', labelHi: 'हल किया', color: 'bg-green-100 text-green-700', icon: CheckCircle },
 };
 
+const typeConfig = {
+  stock: { label: 'Stock', icon: Package, color: 'bg-blue-100 text-blue-700' },
+  delivery: { label: 'Delivery', icon: Truck, color: 'bg-orange-100 text-orange-700' },
+  general: { label: 'General', icon: HelpCircle, color: 'bg-purple-100 text-purple-700' },
+};
+
 const Inquiries = () => {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
@@ -34,15 +41,18 @@ const Inquiries = () => {
   const { inquiries, updateInquiryStatus } = useData();
   const isHindi = i18n.language === 'hi';
   
-  const [activeFilter, setActiveFilter] = useState<'all' | 'pending' | 'responded' | 'resolved'>('all');
+  const [activeTypeFilter, setActiveTypeFilter] = useState<'all' | 'stock' | 'delivery' | 'general'>('all');
+  const [activeStatusFilter, setActiveStatusFilter] = useState<'all' | 'pending' | 'responded' | 'resolved'>('all');
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [responseText, setResponseText] = useState('');
 
   const dealerInquiries = inquiries.filter(i => i.dealerId === user?.id);
   
-  const filteredInquiries = dealerInquiries.filter(i => 
-    activeFilter === 'all' || i.status === activeFilter
-  );
+  const filteredInquiries = dealerInquiries.filter(i => {
+    if (activeTypeFilter !== 'all' && i.type !== activeTypeFilter) return false;
+    if (activeStatusFilter !== 'all' && i.status !== activeStatusFilter) return false;
+    return true;
+  });
 
   const pendingCount = dealerInquiries.filter(i => i.status === 'pending').length;
 
@@ -62,7 +72,14 @@ const Inquiries = () => {
     toast.success(isHindi ? 'पूछताछ हल की गई' : 'Inquiry resolved');
   };
 
-  const filters = [
+  const typeFilters = [
+    { id: 'all', label: isHindi ? 'सभी' : 'All' },
+    { id: 'stock', label: isHindi ? 'स्टॉक' : 'Stock' },
+    { id: 'delivery', label: isHindi ? 'डिलीवरी' : 'Delivery' },
+    { id: 'general', label: isHindi ? 'सामान्य' : 'General' },
+  ];
+
+  const statusFilters = [
     { id: 'all', label: isHindi ? 'सभी' : 'All' },
     { id: 'pending', label: isHindi ? 'लंबित' : 'Pending' },
     { id: 'responded', label: isHindi ? 'उत्तर दिया' : 'Responded' },
@@ -101,22 +118,45 @@ const Inquiries = () => {
           </div>
         </motion.div>
 
-        {/* Filters */}
+        {/* Type Filters */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-4 px-4"
+          className="flex gap-2 mb-3 overflow-x-auto pb-2 -mx-4 px-4"
         >
-          {filters.map((filter) => (
+          {typeFilters.map((filter) => (
             <button
               key={filter.id}
-              onClick={() => setActiveFilter(filter.id as typeof activeFilter)}
+              onClick={() => setActiveTypeFilter(filter.id as typeof activeTypeFilter)}
               className={cn(
                 'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
-                activeFilter === filter.id
+                activeTypeFilter === filter.id
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              )}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </motion.div>
+
+        {/* Status Filters */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="flex gap-2 mb-6 overflow-x-auto pb-2 -mx-4 px-4"
+        >
+          {statusFilters.map((filter) => (
+            <button
+              key={filter.id}
+              onClick={() => setActiveStatusFilter(filter.id as typeof activeStatusFilter)}
+              className={cn(
+                'px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors border',
+                activeStatusFilter === filter.id
+                  ? 'border-primary text-primary bg-primary/10'
+                  : 'border-border text-muted-foreground hover:bg-muted/80'
               )}
             >
               {filter.label}
@@ -140,7 +180,9 @@ const Inquiries = () => {
           <div className="space-y-3">
             {filteredInquiries.map((inquiry, index) => {
               const status = statusConfig[inquiry.status];
+              const type = typeConfig[inquiry.type];
               const StatusIcon = status.icon;
+              const TypeIcon = type.icon;
 
               return (
                 <motion.div
@@ -148,10 +190,7 @@ const Inquiries = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 + index * 0.05 }}
-                  className={cn(
-                    'bg-card border border-border rounded-xl p-4 shadow-soft',
-                    inquiry.urgent && inquiry.status === 'pending' && 'border-l-4 border-l-red-500'
-                  )}
+                  className="bg-card border border-border rounded-xl p-4 shadow-soft"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-3">
@@ -166,12 +205,10 @@ const Inquiries = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {inquiry.urgent && inquiry.status === 'pending' && (
-                        <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                          <AlertTriangle className="h-3 w-3" />
-                          Urgent
-                        </span>
-                      )}
+                      <Badge variant="outline" className={cn('text-[10px] px-1.5 py-0 h-4', type.color)}>
+                        <TypeIcon className="h-2.5 w-2.5 mr-0.5" />
+                        {type.label}
+                      </Badge>
                       <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium flex items-center gap-1', status.color)}>
                         <StatusIcon className="h-3 w-3" />
                         {isHindi ? status.labelHi : status.label}
@@ -180,8 +217,18 @@ const Inquiries = () => {
                   </div>
 
                   <div className="mb-3">
-                    <p className="text-sm font-medium text-foreground">{inquiry.crop}</p>
-                    <p className="text-sm text-muted-foreground">{inquiry.issue}</p>
+                    <p className="text-sm font-medium text-foreground">{inquiry.subject}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-2">{inquiry.message}</p>
+                    {inquiry.productName && (
+                      <p className="text-xs text-primary mt-1 flex items-center gap-1">
+                        <Package className="h-3 w-3" /> {inquiry.productName}
+                      </p>
+                    )}
+                    {inquiry.orderId && (
+                      <p className="text-xs text-primary mt-1 flex items-center gap-1">
+                        <Truck className="h-3 w-3" /> Order #{inquiry.orderId}
+                      </p>
+                    )}
                   </div>
 
                   {inquiry.response && (
