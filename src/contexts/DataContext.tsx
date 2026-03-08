@@ -1336,6 +1336,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       expertApplications, applyForExpert, approveExpert, rejectExpert, getExpertApplication,
       dealerKYCs, submitDealerKYC, approveDealerKYC, rejectDealerKYC, getDealerKYC,
       wishlist, toggleWishlist, isWishlisted, getWishlistProducts,
+    }}>
       {children}
     </DataContext.Provider>
   );
