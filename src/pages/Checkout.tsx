@@ -74,6 +74,7 @@ const Checkout = () => {
     Object.entries(ordersByDealer).forEach(([dealerId, { dealerName, items, total }]) => {
       placeOrder({
         farmerId: user.id,
+        farmerName: user.name,
         dealerId,
         dealerName,
         items,
