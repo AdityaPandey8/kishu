@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   ArrowLeft, Search, TrendingUp, TrendingDown, 
-  Bell, MapPin, Loader2
+  Bell, MapPin, Loader2, Mic
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useVoiceSearch } from '@/hooks/useVoiceSearch';
 
 interface CropPrice {
   cropName: string;
@@ -25,7 +26,7 @@ interface CropPrice {
 }
 
 const MarketPricesPage = () => {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const isHindi = i18n.language === 'hi';
   
@@ -35,9 +36,9 @@ const MarketPricesPage = () => {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const handleSearch = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!searchQuery.trim()) {
+  const handleSearch = useCallback(async (cropOverride?: string) => {
+    const crop = cropOverride || searchQuery.trim();
+    if (!crop) {
       toast.error(isHindi ? 'कृपया फसल का नाम दर्ज करें' : 'Please enter a crop name');
       return;
     }
@@ -46,7 +47,7 @@ const MarketPricesPage = () => {
     setSearched(true);
     try {
       const { data, error } = await supabase.functions.invoke('search-market-prices', {
-        body: { query: searchQuery.trim(), location: locationQuery.trim() || undefined },
+        body: { query: crop, location: locationQuery.trim() || undefined },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -60,7 +61,20 @@ const MarketPricesPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchQuery, locationQuery, isHindi]);
+
+  const cropVoice = useVoiceSearch({
+    onResult: (transcript) => {
+      setSearchQuery(transcript);
+      handleSearch(transcript);
+    },
+  });
+
+  const locationVoice = useVoiceSearch({
+    onResult: (transcript) => {
+      setLocationQuery(transcript);
+    },
+  });
 
   return (
     <AppLayout>
@@ -71,12 +85,7 @@ const MarketPricesPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-3 mb-4"
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-10 w-10 rounded-xl"
-            onClick={() => navigate(-1)}
-          >
+          <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
@@ -87,12 +96,7 @@ const MarketPricesPage = () => {
               {isHindi ? 'फसल खोजें और लाइव मंडी भाव देखें' : 'Search crops for live mandi rates'}
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-10 w-10 rounded-xl"
-            onClick={() => navigate('/notifications')}
-          >
+          <Button variant="outline" size="icon" className="h-10 w-10 rounded-xl" onClick={() => navigate('/notifications')}>
             <Bell className="h-5 w-5" />
           </Button>
         </motion.div>
@@ -103,37 +107,59 @@ const MarketPricesPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="space-y-3 mb-6"
-          onSubmit={handleSearch}
+          onSubmit={(e) => { e.preventDefault(); handleSearch(); }}
         >
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              placeholder={isHindi ? 'फसल का नाम (जैसे गेहूं, टमाटर)...' : 'Crop name (e.g. wheat, tomato)...'}
-              className="h-12 pl-10 pr-4 rounded-xl"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder={isHindi ? 'फसल का नाम (जैसे गेहूं, टमाटर)...' : 'Crop name (e.g. wheat, tomato)...'}
+                className="h-12 pl-10 pr-4 rounded-xl"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            {cropVoice.supported && (
+              <Button
+                type="button"
+                variant={cropVoice.isListening ? 'destructive' : 'outline'}
+                size="icon"
+                className={`h-12 w-12 rounded-xl ${cropVoice.isListening ? 'animate-pulse' : ''}`}
+                onClick={cropVoice.isListening ? cropVoice.stopListening : cropVoice.startListening}
+              >
+                <Mic className="h-5 w-5" />
+              </Button>
+            )}
           </div>
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-            <Input
-              placeholder={isHindi ? 'राज्य या मंडी (वैकल्पिक)...' : 'State or mandi (optional)...'}
-              className="h-12 pl-10 pr-4 rounded-xl"
-              value={locationQuery}
-              onChange={(e) => setLocationQuery(e.target.value)}
-            />
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+              <Input
+                placeholder={isHindi ? 'राज्य या मंडी (वैकल्पिक)...' : 'State or mandi (optional)...'}
+                className="h-12 pl-10 pr-4 rounded-xl"
+                value={locationQuery}
+                onChange={(e) => setLocationQuery(e.target.value)}
+              />
+            </div>
+            {locationVoice.supported && (
+              <Button
+                type="button"
+                variant={locationVoice.isListening ? 'destructive' : 'outline'}
+                size="icon"
+                className={`h-12 w-12 rounded-xl ${locationVoice.isListening ? 'animate-pulse' : ''}`}
+                onClick={locationVoice.isListening ? locationVoice.stopListening : locationVoice.startListening}
+              >
+                <Mic className="h-5 w-5" />
+              </Button>
+            )}
           </div>
           <Button type="submit" className="w-full h-12 rounded-xl text-base" disabled={loading}>
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin mr-2" />
-            ) : (
-              <Search className="h-5 w-5 mr-2" />
-            )}
-            {isHindi ? 'भाव खोजें' : 'Search Prices'}
+            {loading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : <Search className="h-5 w-5 mr-2" />}
+            {t('common.search')}
           </Button>
         </motion.form>
 
-        {/* Loading Skeleton */}
+        {/* Loading */}
         {loading && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[1, 2, 3, 4].map((i) => (
@@ -152,7 +178,6 @@ const MarketPricesPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {prices.map((crop, index) => {
               const isPositive = crop.trend >= 0;
-
               return (
                 <motion.div
                   key={`${crop.cropName}-${crop.mandi}-${index}`}
@@ -170,17 +195,14 @@ const MarketPricesPage = () => {
                       {crop.mandi}, {crop.state}
                     </p>
                   </div>
-
                   <div className="flex items-end justify-between">
                     <div>
-                      <div className="text-2xl font-bold text-foreground">
-                        ₹{crop.price.toLocaleString()}
-                      </div>
+                      <div className="text-2xl font-bold text-foreground">₹{crop.price.toLocaleString()}</div>
                       <p className="text-xs text-muted-foreground">/{crop.unit}</p>
                     </div>
                     <div className={cn(
                       'flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
-                      isPositive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                      isPositive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
                     )}>
                       {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
                       {Math.abs(crop.trend)}%
@@ -192,7 +214,7 @@ const MarketPricesPage = () => {
           </div>
         )}
 
-        {/* Empty state */}
+        {/* Empty */}
         {!loading && searched && prices.length === 0 && (
           <div className="text-center py-12">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
@@ -202,7 +224,7 @@ const MarketPricesPage = () => {
           </div>
         )}
 
-        {/* Initial state */}
+        {/* Initial */}
         {!loading && !searched && (
           <div className="text-center py-12">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-3" />

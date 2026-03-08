@@ -10,15 +10,21 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { location } = await req.json();
-    if (!location || typeof location !== "string") {
-      return new Response(JSON.stringify({ error: "location is required" }), {
+    const { location, lat, lng } = await req.json();
+    
+    let query: string;
+    if (lat !== undefined && lng !== undefined) {
+      query = `${lat},${lng}`;
+    } else if (location && typeof location === "string") {
+      query = location;
+    } else {
+      return new Response(JSON.stringify({ error: "location or lat/lng is required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const url = `https://wttr.in/${encodeURIComponent(location)}?format=j1`;
+    const url = `https://wttr.in/${encodeURIComponent(query)}?format=j1`;
     const res = await fetch(url, {
       headers: { "User-Agent": "curl/7.68.0" },
     });
@@ -37,7 +43,7 @@ serve(async (req) => {
     const forecast = data.weather?.slice(0, 5) || [];
 
     const result = {
-      location: data.nearest_area?.[0]?.areaName?.[0]?.value || location,
+      location: data.nearest_area?.[0]?.areaName?.[0]?.value || location || query,
       region: data.nearest_area?.[0]?.region?.[0]?.value || "",
       country: data.nearest_area?.[0]?.country?.[0]?.value || "",
       current: {
