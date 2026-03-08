@@ -7,7 +7,6 @@ import { RecentDiagnoses } from '@/components/home/RecentDiagnoses';
 import { MarketPrices } from '@/components/home/MarketPrices';
 
 import { ExpertHelp } from '@/components/home/ExpertHelp';
-import { CropGuide } from '@/components/home/CropGuide';
 import { WeatherAlertsWidget } from '@/components/home/WeatherAlertsWidget';
 import { AppSuggests } from '@/components/home/AppSuggests';
 import { useAuth } from '@/contexts/AuthContext';
@@ -64,9 +63,6 @@ const FarmerDashboard = () => {
 
         {/* Expert Help */}
         <ExpertHelp />
-
-        {/* Crop Guide */}
-        <CropGuide />
 
         {/* Recent Diagnoses */}
         <RecentDiagnoses />
