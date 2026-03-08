@@ -12,6 +12,7 @@ export interface OrderItem {
 export interface Order {
   id: string;
   farmerId: string;
+  farmerName: string;
   dealerId: string;
   dealerName: string;
   items: OrderItem[];
@@ -662,6 +663,7 @@ const seedOrders: Order[] = [
   {
     id: 'ord1',
     farmerId: 'farmer-001',
+    farmerName: 'Ramesh Kumar',
     dealerId: 'dealer-001',
     dealerName: 'Sunil Agro Supplies',
     items: [
@@ -678,6 +680,7 @@ const seedOrders: Order[] = [
   {
     id: 'ord2',
     farmerId: 'farmer-001',
+    farmerName: 'Ramesh Kumar',
     dealerId: 'dealer-001',
     dealerName: 'Sunil Agro Supplies',
     items: [
@@ -689,6 +692,57 @@ const seedOrders: Order[] = [
     shippingAddress: 'Village Rampur, Jaipur, Rajasthan',
     createdAt: '2026-01-18T10:00:00Z',
     updatedAt: '2026-01-19T12:00:00Z'
+  },
+  {
+    id: 'ord3',
+    farmerId: 'f3',
+    farmerName: 'Priya Sharma',
+    dealerId: 'dealer-001',
+    dealerName: 'Sunil Agro Supplies',
+    items: [
+      { productId: 'p6', productName: 'Imidacloprid', quantity: 2, price: 520 },
+      { productId: 'p1', productName: 'Mancozeb 75% WP', quantity: 1, price: 450 }
+    ],
+    totalAmount: 1490,
+    status: 'delivered',
+    paymentMethod: 'online',
+    shippingAddress: '12 Farm Lane, Ahmedabad, Gujarat',
+    createdAt: '2026-01-12T08:00:00Z',
+    updatedAt: '2026-01-15T10:00:00Z'
+  },
+  {
+    id: 'ord4',
+    farmerId: 'f4',
+    farmerName: 'Mohan Singh',
+    dealerId: 'dealer-001',
+    dealerName: 'Sunil Agro Supplies',
+    items: [
+      { productId: 'p4', productName: 'Urea 46%', quantity: 5, price: 800 },
+      { productId: 'p7', productName: 'Potash MOP', quantity: 2, price: 950 }
+    ],
+    totalAmount: 5900,
+    status: 'confirmed',
+    paymentMethod: 'cod',
+    shippingAddress: 'Village Kolar, Bhopal, MP',
+    createdAt: '2026-01-20T09:00:00Z',
+    updatedAt: '2026-01-20T09:00:00Z'
+  },
+  {
+    id: 'ord5',
+    farmerId: 'f5',
+    farmerName: 'Geeta Devi',
+    dealerId: 'dealer-001',
+    dealerName: 'Sunil Agro Supplies',
+    items: [
+      { productId: 'p5', productName: 'Carbendazim 50%', quantity: 3, price: 380 },
+      { productId: 'p8', productName: 'Micronutrient Mix', quantity: 2, price: 280 }
+    ],
+    totalAmount: 1700,
+    status: 'delivered',
+    paymentMethod: 'upi',
+    shippingAddress: 'Ward 5, Patna, Bihar',
+    createdAt: '2026-01-08T11:00:00Z',
+    updatedAt: '2026-01-13T14:00:00Z'
   },
 ];
 
