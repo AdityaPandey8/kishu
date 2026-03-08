@@ -18,6 +18,7 @@ import { TopProducts } from '@/components/dealer/TopProducts';
 import { InventoryAlert } from '@/components/dealer/InventoryAlert';
 import { InquiryDetailModal } from '@/components/dealer/InquiryDetailModal';
 import { RevenueChart } from '@/components/dealer/RevenueChart';
+import { SellerOnboardingChecklist, getDefaultChecklistItems } from '@/components/dealer/SellerOnboardingChecklist';
 import { Inquiry } from '@/contexts/DataContext';
 import { toast } from 'sonner';
 
@@ -186,16 +187,29 @@ const DealerDashboard = () => {
           </div>
         </motion.div>
 
+        {/* Seller Onboarding Checklist */}
+        <SellerOnboardingChecklist
+          title={isHindi ? 'सेटअप पूरा करें' : 'Complete Your Setup'}
+          items={getDefaultChecklistItems(
+            isHindi,
+            user?.kycStatus === 'approved',
+            !!user?.avatar,
+            dealerProducts.length,
+            resolvedCount + inProgressCount,
+            user?.kycStatus === 'approved',
+          )}
+        />
+
         {/* Order Lifecycle */}
         <div>
           <h3 className="text-sm font-semibold text-foreground mb-2">
             {isHindi ? 'पूछताछ अवलोकन' : 'Inquiry Overview'}
           </h3>
           <OrderLifecycleCards items={[
-            { label: isHindi ? 'लंबित' : 'Pending', count: pendingCount, icon: 'pending', onClick: () => navigate('/inquiries') },
-            { label: isHindi ? 'प्रगति में' : 'In Progress', count: inProgressCount, icon: 'progress', onClick: () => navigate('/inquiries') },
-            { label: isHindi ? 'हल किया' : 'Resolved', count: resolvedCount, icon: 'resolved', onClick: () => navigate('/inquiries') },
-            { label: isHindi ? 'कुल' : 'Total', count: dealerInquiries.length, icon: 'total', onClick: () => navigate('/inquiries') },
+            { label: isHindi ? 'लंबित' : 'Pending', count: pendingCount, icon: 'pending', onClick: () => navigate('/dealer/orders') },
+            { label: isHindi ? 'प्रगति में' : 'In Progress', count: inProgressCount, icon: 'progress', onClick: () => navigate('/dealer/orders') },
+            { label: isHindi ? 'हल किया' : 'Resolved', count: resolvedCount, icon: 'resolved', onClick: () => navigate('/dealer/orders') },
+            { label: isHindi ? 'कुल' : 'Total', count: dealerInquiries.length, icon: 'total', onClick: () => navigate('/dealer/orders') },
           ]} />
         </div>
 
