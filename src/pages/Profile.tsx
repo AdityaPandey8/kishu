@@ -7,7 +7,7 @@ import {
   Settings, Shield, Camera, Edit2, Phone, Mail, Ruler, Clock,
   Award, Leaf, TrendingUp, Video, ShoppingBag, Package, Play,
   Store, Star, BarChart3, BadgeCheck, FileText, IndianRupee,
-  MessageSquare, Box, Users, Truck
+  MessageSquare, Box, Users, Truck, Pencil
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -17,6 +17,7 @@ import { useData } from '@/contexts/DataContext';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import ProfileActivityTabs from '@/components/profile/ProfileActivityTabs';
+import EditStoreProfileDialog from '@/components/dealer/EditStoreProfileDialog';
 
 const Profile = () => {
   const { t, i18n } = useTranslation();
@@ -55,6 +56,7 @@ const Profile = () => {
   return <FarmerProfile />;
 
   function DealerProfile() {
+    const [editOpen, setEditOpen] = useState(false);
     const kycBadge = {
       approved: { label: isHindi ? 'सत्यापित' : 'Verified', class: 'bg-green-500/10 text-green-600 border-green-500/20' },
       pending: { label: isHindi ? 'समीक्षा में' : 'Under Review', class: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
@@ -77,6 +79,7 @@ const Profile = () => {
       { icon: FileText, label: 'GST', value: kycData?.gstNumber || 'Not submitted' },
       { icon: Store, label: isHindi ? 'व्यवसाय प्रकार' : 'Business Type', value: kycData?.businessType ? kycData.businessType.charAt(0).toUpperCase() + kycData.businessType.slice(1) : 'Not set' },
       { icon: Users, label: isHindi ? 'ग्राहक' : 'Customers', value: dealerCustomers.length.toString() },
+      ...(user?.operatingHours ? [{ icon: Clock, label: isHindi ? 'कार्य समय' : 'Hours', value: `${user.operatingHours.open} – ${user.operatingHours.close} (${user.operatingHours.days.join(', ')})` }] : []),
     ];
 
     const quickActions = [
@@ -102,10 +105,17 @@ const Profile = () => {
 
             <div className="relative flex items-start gap-4">
               <div className="relative">
-                <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg">
-                  <Store className="h-10 w-10 text-primary-foreground" />
+                <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg overflow-hidden">
+                  {user?.storeLogo ? (
+                    <img src={user.storeLogo} alt="Store" className="h-full w-full object-cover" />
+                  ) : (
+                    <Store className="h-10 w-10 text-primary-foreground" />
+                  )}
                 </div>
-                <button className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-muted transition-colors">
+                <button
+                  onClick={() => setEditOpen(true)}
+                  className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-card border border-border shadow-soft flex items-center justify-center hover:bg-muted transition-colors"
+                >
                   <Camera className="h-3.5 w-3.5 text-muted-foreground" />
                 </button>
               </div>
@@ -118,8 +128,17 @@ const Profile = () => {
                   {user?.kycStatus === 'approved' && (
                     <BadgeCheck className="h-5 w-5 text-primary flex-shrink-0" />
                   )}
+                  <button
+                    onClick={() => setEditOpen(true)}
+                    className="h-6 w-6 rounded-lg bg-muted flex items-center justify-center hover:bg-accent transition-colors"
+                  >
+                    <Pencil className="h-3 w-3 text-muted-foreground" />
+                  </button>
                 </div>
                 <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
+                {user?.storeDescription && (
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{user.storeDescription}</p>
+                )}
                 <div className="flex items-center gap-2 mt-2">
                   <Badge variant="outline" className={cn('text-[10px] px-2 py-0.5', kyc.class)}>
                     {kyc.label}
@@ -271,6 +290,8 @@ const Profile = () => {
               {t('auth.logout')}
             </Button>
           </motion.div>
+
+          <EditStoreProfileDialog open={editOpen} onOpenChange={setEditOpen} />
         </div>
       </AppLayout>
     );

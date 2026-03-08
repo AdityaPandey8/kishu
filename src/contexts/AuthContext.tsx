@@ -31,6 +31,10 @@ export interface User {
   kycSubmittedAt?: string;
   kycApprovedAt?: string;
   kycRejectionReason?: string;
+  // Store profile fields
+  storeDescription?: string;
+  storeLogo?: string;
+  operatingHours?: { open: string; close: string; days: string[] };
 }
 
 interface LoginResult {
