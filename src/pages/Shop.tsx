@@ -29,6 +29,22 @@ const banners = [
   { id: 5, title: 'Nursery Plants Collection', subtitle: 'Fresh plants delivered to your doorstep', gradient: 'from-pink-600 to-pink-400' },
 ];
 
+const seasonalTips = [
+  { label: '🌱 Spring Picks', tip: 'Best time to plant fruit saplings!' },
+  { label: '🌧️ Monsoon Ready', tip: 'Hardy indoor plants for the season' },
+  { label: '☀️ Summer Essentials', tip: 'Heat-resistant varieties available' },
+];
+
+const ProductImage = ({ src, alt, className }: { src?: string; alt: string; className?: string }) => (
+  src ? (
+    <img src={src} alt={alt} className={cn('w-full h-full object-cover', className)} loading="lazy" />
+  ) : (
+    <div className="w-full h-full flex items-center justify-center">
+      <Package className="h-10 w-10 text-primary/30" />
+    </div>
+  )
+);
+
 const Shop = () => {
   const navigate = useNavigate();
   const { products, getCartItemCount, platformUsers, isWishlisted, toggleWishlist } = useData();
@@ -39,7 +55,6 @@ const Shop = () => {
 
   const cartItemCount = getCartItemCount();
 
-  // Auto-slide banners
   useEffect(() => {
     if (!emblaApi) return;
     const interval = setInterval(() => emblaApi.scrollNext(), 3500);
@@ -80,7 +95,11 @@ const Shop = () => {
     [products]
   );
 
-  // Countdown timer
+  const nurseryPlants = useMemo(() =>
+    products.filter(p => p.category === 'Plants' && p.stock > 0).sort((a, b) => b.sales - a.sales),
+    [products]
+  );
+
   const [timeLeft, setTimeLeft] = useState({ h: 5, m: 42, s: 18 });
   useEffect(() => {
     const timer = setInterval(() => {
@@ -100,6 +119,8 @@ const Shop = () => {
     toggleWishlist(productId);
   }, [toggleWishlist]);
 
+  const showHomeSections = !searchQuery && selectedCategory === 'All';
+
   return (
     <AppLayout>
       <div className="min-h-screen bg-background pb-4">
@@ -115,20 +136,10 @@ const Shop = () => {
                 className="pl-10 rounded-lg bg-background border-0 h-10"
               />
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative text-primary-foreground hover:bg-primary/80"
-              onClick={() => navigate('/wishlist')}
-            >
+            <Button variant="ghost" size="icon" className="relative text-primary-foreground hover:bg-primary/80" onClick={() => navigate('/wishlist')}>
               <Heart className="h-5 w-5" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative text-primary-foreground hover:bg-primary/80"
-              onClick={() => navigate('/cart')}
-            >
+            <Button variant="ghost" size="icon" className="relative text-primary-foreground hover:bg-primary/80" onClick={() => navigate('/cart')}>
               <ShoppingCart className="h-5 w-5" />
               {cartItemCount > 0 && (
                 <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center font-bold">
@@ -140,7 +151,7 @@ const Shop = () => {
         </div>
 
         {/* Banner Carousel */}
-        {!searchQuery && selectedCategory === 'All' && (
+        {showHomeSections && (
           <div className="px-4 pt-4">
             <div className="overflow-hidden rounded-2xl" ref={emblaRef}>
               <div className="flex">
@@ -191,7 +202,7 @@ const Shop = () => {
         </div>
 
         {/* Deal of the Day */}
-        {!searchQuery && selectedCategory === 'All' && (
+        {showHomeSections && (
           <div className="pt-6">
             <div className="flex items-center justify-between px-4 mb-3">
               <div className="flex items-center gap-2">
@@ -214,8 +225,8 @@ const Shop = () => {
                   onClick={() => navigate(`/shop/${product.id}`)}
                   className="flex-shrink-0 w-36 bg-card border border-border rounded-2xl overflow-hidden cursor-pointer"
                 >
-                  <div className="h-28 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center relative">
-                    <Package className="h-10 w-10 text-primary/30" />
+                  <div className="h-28 bg-gradient-to-br from-primary/5 to-muted/50 relative overflow-hidden">
+                    <ProductImage src={product.image} alt={product.name} />
                     <Badge className="absolute top-2 left-2 bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5">
                       {getDiscount()}% OFF
                     </Badge>
@@ -232,7 +243,7 @@ const Shop = () => {
         )}
 
         {/* Trending Now */}
-        {!searchQuery && selectedCategory === 'All' && (
+        {showHomeSections && (
           <div className="pt-6">
             <div className="flex items-center justify-between px-4 mb-3">
               <h2 className="text-lg font-bold text-foreground">🔥 Trending Now</h2>
@@ -249,8 +260,8 @@ const Shop = () => {
                   onClick={() => navigate(`/shop/${product.id}`)}
                   className="flex-shrink-0 w-44 bg-card border border-border rounded-2xl overflow-hidden cursor-pointer"
                 >
-                  <div className="h-32 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center relative">
-                    <Package className="h-12 w-12 text-primary/30" />
+                  <div className="h-32 bg-gradient-to-br from-primary/5 to-muted/50 relative overflow-hidden">
+                    <ProductImage src={product.image} alt={product.name} />
                     <button
                       onClick={(e) => handleWishlistClick(e, product.id)}
                       className="absolute top-2 right-2 h-7 w-7 rounded-full bg-background/80 flex items-center justify-center"
@@ -267,6 +278,68 @@ const Shop = () => {
                     </div>
                     <p className="text-base font-bold text-foreground mt-1">₹{product.price}</p>
                     <p className="text-[10px] text-primary font-medium mt-0.5">Free Delivery</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 🌿 From the Nursery */}
+        {showHomeSections && nurseryPlants.length > 0 && (
+          <div className="pt-6">
+            <div className="flex items-center justify-between px-4 mb-2">
+              <h2 className="text-lg font-bold text-foreground">🌿 From the Nursery</h2>
+              <button
+                className="text-sm text-primary font-medium flex items-center gap-1"
+                onClick={() => setSelectedCategory('Plants')}
+              >
+                View All <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Seasonal Tips */}
+            <div className="flex gap-2 overflow-x-auto px-4 pb-3 scrollbar-none">
+              {seasonalTips.map((s, i) => (
+                <div key={i} className="flex-shrink-0 bg-primary/5 border border-primary/15 rounded-full px-3 py-1.5 flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-primary whitespace-nowrap">{s.label}</span>
+                  <span className="text-[10px] text-muted-foreground whitespace-nowrap">{s.tip}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Nursery Plant Cards */}
+            <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-none">
+              {nurseryPlants.map(product => (
+                <motion.div
+                  key={product.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onClick={() => navigate(`/shop/${product.id}`)}
+                  className="flex-shrink-0 w-40 bg-card border border-border rounded-2xl overflow-hidden cursor-pointer"
+                >
+                  <div className="h-36 bg-gradient-to-br from-pink-50 to-green-50 dark:from-pink-950/30 dark:to-green-950/30 relative overflow-hidden">
+                    <ProductImage src={product.image} alt={product.name} />
+                    <Badge className="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] px-1.5 py-0.5">
+                      Nursery Fresh
+                    </Badge>
+                    <button
+                      onClick={(e) => handleWishlistClick(e, product.id)}
+                      className="absolute top-2 right-2 h-7 w-7 rounded-full bg-background/80 flex items-center justify-center"
+                    >
+                      <Heart className={cn('h-4 w-4', isWishlisted(product.id) ? 'fill-destructive text-destructive' : 'text-muted-foreground')} />
+                    </button>
+                  </div>
+                  <div className="p-2.5">
+                    <p className="text-[10px] text-muted-foreground truncate">{getDealerName(product.dealerId)}</p>
+                    <p className="text-sm font-medium text-foreground line-clamp-2 min-h-[36px] mt-0.5">{product.name}</p>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="font-bold text-foreground">₹{product.price}</span>
+                      <div className="flex items-center gap-0.5">
+                        <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                        <span className="text-[10px] text-muted-foreground">{product.rating?.toFixed(1)}</span>
+                      </div>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -295,8 +368,8 @@ const Shop = () => {
                 onClick={() => navigate(`/shop/${product.id}`)}
                 className="bg-card border border-border rounded-2xl overflow-hidden shadow-soft cursor-pointer hover:shadow-md transition-shadow"
               >
-                <div className="h-32 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center relative">
-                  <Package className="h-12 w-12 text-primary/30" />
+                <div className="h-32 bg-gradient-to-br from-primary/5 to-muted/50 relative overflow-hidden">
+                  <ProductImage src={product.image} alt={product.name} />
                   <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5">
                     {discount}% OFF
                   </Badge>
