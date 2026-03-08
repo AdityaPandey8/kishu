@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Bell, Settings, Plus, BadgeCheck, TrendingUp,
-  ArrowRight, IndianRupee
+  Bell, Settings, Plus, BadgeCheck, TrendingUp, IndianRupee
 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
