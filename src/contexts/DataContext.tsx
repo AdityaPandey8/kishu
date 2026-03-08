@@ -1,5 +1,6 @@
 import { createContext, useContext, ReactNode, useCallback } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
+import { toast } from 'sonner';
 
 // Shop Types
 export interface OrderItem {
