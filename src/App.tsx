@@ -51,6 +51,7 @@ import LocationSettings from "./pages/LocationSettings";
 import MarketPricesPage from "./pages/MarketPricesPage";
 import BecomeExpert from "./pages/BecomeExpert";
 import ExpertDashboard from "./pages/ExpertDashboard";
+import Experts from "./pages/Experts";
 import AdminExperts from "./pages/admin/AdminExperts";
 import AdminKYC from "./pages/admin/AdminKYC";
 import DealerKYC from "./pages/dealer/DealerKYC";
@@ -115,6 +116,7 @@ const App = () => (
                 <Route path="/creator-studio/upload" element={<UploadReel />} />
                 <Route path="/settings/location" element={<LocationSettings />} />
                 <Route path="/market-prices" element={<MarketPricesPage />} />
+                <Route path="/experts" element={<Experts />} />
                 <Route path="/become-expert" element={<BecomeExpert />} />
                 <Route path="/expert-dashboard" element={<ExpertDashboard />} />
                 <Route path="/admin/experts" element={<AdminExperts />} />

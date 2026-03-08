@@ -9,7 +9,9 @@ import {
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { useData } from '@/contexts/DataContext';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 const platformStats = [
   { label: 'Total Users', value: '2,847', change: '+156 this week', icon: Users, color: 'text-blue-600', bg: 'bg-blue-100' },
@@ -34,7 +36,10 @@ const recentActivity = [
 const AdminDashboard = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const { expertApplications } = useData();
+  const navigate = useNavigate();
   const isHindi = i18n.language === 'hi';
+  const pendingExperts = expertApplications.filter(a => a.status === 'pending').length;
 
   return (
     <AppLayout>
@@ -137,6 +142,34 @@ const AdminDashboard = () => {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </motion.div>
+
+        {/* Expert Approvals */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+          whileHover={{ scale: 1.02, y: -4 }}
+          onClick={() => navigate('/admin/experts')}
+          className="rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 p-4 shadow-soft cursor-pointer"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Shield className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground text-sm">
+                  {isHindi ? 'विशेषज्ञ अनुमोदन' : 'Expert Approvals'}
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  {pendingExperts} {isHindi ? 'आवेदन लंबित' : 'applications pending'}
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </div>
         </motion.div>
 

@@ -1,11 +1,14 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MessageCircle, Phone, Video, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const ExpertHelp = () => {
   const { i18n } = useTranslation();
+  const navigate = useNavigate();
   const isHindi = i18n.language === 'hi';
+  const goToExperts = () => navigate('/experts');
 
   return (
     <motion.div
@@ -33,15 +36,15 @@ export const ExpertHelp = () => {
             {isHindi ? 'कृषि विशेषज्ञों से सीधे सलाह लें' : 'Get direct advice from agriculture experts'}
           </p>
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" className="h-8 rounded-lg text-xs">
+            <Button size="sm" variant="outline" className="h-8 rounded-lg text-xs" onClick={goToExperts}>
               <Phone className="h-3 w-3 mr-1" />
               {isHindi ? 'कॉल' : 'Call'}
             </Button>
-            <Button size="sm" variant="outline" className="h-8 rounded-lg text-xs">
+            <Button size="sm" variant="outline" className="h-8 rounded-lg text-xs" onClick={goToExperts}>
               <Video className="h-3 w-3 mr-1" />
               {isHindi ? 'वीडियो' : 'Video'}
             </Button>
-            <Button size="sm" className="h-8 rounded-lg text-xs gradient-kishu ml-auto">
+            <Button size="sm" className="h-8 rounded-lg text-xs gradient-kishu ml-auto" onClick={goToExperts}>
               <ArrowRight className="h-3 w-3" />
             </Button>
           </div>
