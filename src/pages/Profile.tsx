@@ -290,6 +290,8 @@ const Profile = () => {
               {t('auth.logout')}
             </Button>
           </motion.div>
+
+          <EditStoreProfileDialog open={editOpen} onOpenChange={setEditOpen} />
         </div>
       </AppLayout>
     );
