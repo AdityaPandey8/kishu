@@ -1297,6 +1297,23 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return dealerKYCs.find(kyc => kyc.dealerId === dealerId);
   }, [dealerKYCs]);
 
+  // Wishlist
+  const toggleWishlist = useCallback((productId: string) => {
+    setWishlist(prev =>
+      prev.includes(productId)
+        ? prev.filter(id => id !== productId)
+        : [...prev, productId]
+    );
+  }, [setWishlist]);
+
+  const isWishlisted = useCallback((productId: string) => {
+    return wishlist.includes(productId);
+  }, [wishlist]);
+
+  const getWishlistProducts = useCallback(() => {
+    return products.filter(p => wishlist.includes(p.id));
+  }, [products, wishlist]);
+
   return (
     <DataContext.Provider value={{
       diagnoses, addDiagnosis, deleteDiagnosis, toggleBookmark,
@@ -1318,7 +1335,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       trackedCrops, trackCrop, untrackCrop, isTrackedCrop,
       expertApplications, applyForExpert, approveExpert, rejectExpert, getExpertApplication,
       dealerKYCs, submitDealerKYC, approveDealerKYC, rejectDealerKYC, getDealerKYC,
-    }}>
+      wishlist, toggleWishlist, isWishlisted, getWishlistProducts,
       {children}
     </DataContext.Provider>
   );
