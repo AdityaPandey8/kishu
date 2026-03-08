@@ -401,6 +401,12 @@ interface DataContextType {
   approveDealerKYC: (kycId: string, dealerId: string, adminId: string) => void;
   rejectDealerKYC: (kycId: string, dealerId: string, adminId: string, reason: string) => void;
   getDealerKYC: (dealerId: string) => DealerKYC | undefined;
+
+  // Wishlist
+  wishlist: string[];
+  toggleWishlist: (productId: string) => void;
+  isWishlisted: (productId: string) => boolean;
+  getWishlistProducts: () => Product[];
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
