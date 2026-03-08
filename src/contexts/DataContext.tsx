@@ -751,7 +751,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [dealerKYCs, setDealerKYCs] = useLocalStorage<DealerKYC[]>('kishu-dealer-kycs', seedDealerKYCs);
   const [wishlist, setWishlist] = useLocalStorage<string[]>('kishu-wishlist', []);
 
-
   // Diagnoses
   const addDiagnosis = useCallback((diagnosis: Omit<Diagnosis, 'id' | 'date'>): Diagnosis => {
     const newDiagnosis: Diagnosis = {
