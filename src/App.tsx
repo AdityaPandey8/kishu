@@ -61,6 +61,7 @@ import DealerKYC from "./pages/dealer/DealerKYC";
 import KYCPending from "./pages/dealer/KYCPending";
 import KYCRejected from "./pages/dealer/KYCRejected";
 import NotFound from "./pages/NotFound";
+import Wishlist from "./pages/Wishlist";
 
 const queryClient = new QueryClient();
 
@@ -130,6 +131,7 @@ const App = () => (
                 <Route path="/dealer/kyc" element={<DealerKYC />} />
                 <Route path="/dealer/kyc-pending" element={<KYCPending />} />
                 <Route path="/dealer/kyc-rejected" element={<KYCRejected />} />
+                <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

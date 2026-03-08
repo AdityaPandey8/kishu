@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Star, Package, ShoppingCart, Plus, Minus, MapPin, Check, Truck, Shield, Heart, Share2, Tag, CreditCard, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Star, Package, ShoppingCart, Plus, Minus, MapPin, Check, Truck, Shield, Heart, Share2, Tag, CreditCard, ChevronRight, Zap } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

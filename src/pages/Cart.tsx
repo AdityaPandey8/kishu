@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Trash2, Plus, Minus, ShoppingBag, Package, Tag, ChevronDown, ChevronUp, Shield, Truck, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Plus, Minus, ShoppingBag, Package, Tag, ChevronDown, ChevronUp, Shield, Truck, RotateCcw } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
