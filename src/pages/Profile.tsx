@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import ProfileActivityTabs from '@/components/profile/ProfileActivityTabs';
 
 const Profile = () => {
   const { t, i18n } = useTranslation();
@@ -285,6 +286,9 @@ const Profile = () => {
             </Button>
           </motion.div>
         )}
+
+        {/* Activity Tabs */}
+        {user && <ProfileActivityTabs />}
 
         {/* Quick Actions */}
         <motion.div

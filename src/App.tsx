@@ -25,6 +25,8 @@ import Diagnosis from "./pages/Diagnosis";
 import Crops from "./pages/Crops";
 import CropDetail from "./pages/CropDetail";
 import Community from "./pages/Community";
+import CommunityVideo from "./pages/CommunityVideo";
+import CommunitySearch from "./pages/CommunitySearch";
 import WeatherAlerts from "./pages/WeatherAlerts";
 import Notifications from "./pages/Notifications";
 import Help from "./pages/Help";
@@ -93,6 +95,8 @@ const App = () => (
                 <Route path="/crops" element={<Crops />} />
                 <Route path="/crops/:id" element={<CropDetail />} />
                 <Route path="/community" element={<Community />} />
+                <Route path="/community/video/:postId" element={<CommunityVideo />} />
+                <Route path="/community/search" element={<CommunitySearch />} />
                 <Route path="/weather-alerts" element={<WeatherAlerts />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/help" element={<Help />} />
