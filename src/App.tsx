@@ -67,6 +67,12 @@ import OrderManagement from "./pages/dealer/OrderManagement";
 import BuyerProfile from "./pages/BuyerProfile";
 import NotFound from "./pages/NotFound";
 import Wishlist from "./pages/Wishlist";
+import AgriServices from "./pages/agri-services/AgriServices";
+import ServiceDetail from "./pages/agri-services/ServiceDetail";
+import BookService from "./pages/agri-services/BookService";
+import MyBookings from "./pages/agri-services/MyBookings";
+import BookingDetail from "./pages/agri-services/BookingDetail";
+import Home from "./pages/Home";
 
 const queryClient = new QueryClient();
 
