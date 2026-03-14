@@ -888,6 +888,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [trackedCrops, setTrackedCrops] = useLocalStorage<TrackedCrop[]>('kishu-tracked-crops', []);
   const [expertApplications, setExpertApplications] = useLocalStorage<ExpertApplication[]>('kishu-expert-applications', seedExpertApplications);
   const [dealerKYCs, setDealerKYCs] = useLocalStorage<DealerKYC[]>('kishu-dealer-kycs', seedDealerKYCs);
+  const [agriServices] = useLocalStorage<AgriService[]>('kishu-agri-services', seedAgriServices);
+  const [serviceBookings, setServiceBookings] = useLocalStorage<ServiceBooking[]>('kishu-service-bookings', seedServiceBookings);
   const [wishlist, setWishlist] = useLocalStorage<string[]>('kishu-wishlist', []);
 
   // Diagnoses
