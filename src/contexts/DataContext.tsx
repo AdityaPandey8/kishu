@@ -1496,6 +1496,30 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return products.filter(p => wishlist.includes(p.id));
   }, [products, wishlist]);
 
+  // Agri Service Bookings
+  const addServiceBooking = useCallback((booking: Omit<ServiceBooking, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const now = new Date().toISOString();
+    const newBooking: ServiceBooking = {
+      ...booking,
+      id: `sb${Date.now()}`,
+      createdAt: now,
+      updatedAt: now,
+    };
+    setServiceBookings(prev => [newBooking, ...prev]);
+  }, [setServiceBookings]);
+
+  const updateBookingStatusFn = useCallback((id: string, status: ServiceBooking['status']) => {
+    setServiceBookings(prev => prev.map(b =>
+      b.id === id ? { ...b, status, updatedAt: new Date().toISOString() } : b
+    ));
+  }, [setServiceBookings]);
+
+  const rateService = useCallback((bookingId: string, rating: number, review?: string) => {
+    setServiceBookings(prev => prev.map(b =>
+      b.id === bookingId ? { ...b, rating, review, updatedAt: new Date().toISOString() } : b
+    ));
+  }, [setServiceBookings]);
+
   return (
     <DataContext.Provider value={{
       diagnoses, addDiagnosis, deleteDiagnosis, toggleBookmark,
@@ -1518,6 +1542,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       expertApplications, applyForExpert, approveExpert, rejectExpert, getExpertApplication,
       dealerKYCs, submitDealerKYC, approveDealerKYC, rejectDealerKYC, getDealerKYC,
       wishlist, toggleWishlist, isWishlisted, getWishlistProducts,
+      agriServices, serviceBookings, addServiceBooking,
+      updateBookingStatus: updateBookingStatusFn, rateService,
     }}>
       {children}
     </DataContext.Provider>
