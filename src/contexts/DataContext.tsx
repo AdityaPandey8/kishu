@@ -94,6 +94,45 @@ export interface TrackedCrop {
   createdAt: string;
 }
 
+// Agri Service Types
+export interface AgriService {
+  id: string;
+  name: string;
+  category: 'equipment-rental' | 'soil-testing' | 'spraying' | 'harvesting' | 'other';
+  description: string;
+  price: number;
+  priceUnit: 'per_hour' | 'per_acre' | 'per_visit' | 'fixed';
+  rating: number;
+  totalBookings: number;
+  image: string;
+  providerId: string;
+  providerName: string;
+  availability: boolean;
+}
+
+export interface ServiceBooking {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  category: string;
+  farmerId: string;
+  farmerName: string;
+  providerId: string;
+  providerName: string;
+  status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'disputed';
+  scheduledDate: string;
+  scheduledTime: string;
+  location: string;
+  acres?: number;
+  totalAmount: number;
+  paymentStatus: 'pending' | 'paid' | 'refunded';
+  paymentMethod: 'cod' | 'online' | 'upi';
+  rating?: number;
+  review?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Expert Types
 export interface ExpertApplication {
   id: string;
@@ -405,6 +444,13 @@ interface DataContextType {
   approveDealerKYC: (kycId: string, dealerId: string, adminId: string) => void;
   rejectDealerKYC: (kycId: string, dealerId: string, adminId: string, reason: string) => void;
   getDealerKYC: (dealerId: string) => DealerKYC | undefined;
+
+  // Agri Services
+  agriServices: AgriService[];
+  serviceBookings: ServiceBooking[];
+  addServiceBooking: (booking: Omit<ServiceBooking, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateBookingStatus: (id: string, status: ServiceBooking['status']) => void;
+  rateService: (bookingId: string, rating: number, review?: string) => void;
 
   // Wishlist
   wishlist: string[];
@@ -804,6 +850,24 @@ const seedDealerKYCs: DealerKYC[] = [
   },
 ];
 
+// Seed Agri Services
+const seedAgriServices: AgriService[] = [
+  { id: 'as1', name: 'Tractor Rental - Ploughing', category: 'equipment-rental', description: 'Heavy-duty tractor for deep ploughing. Includes experienced operator. Suitable for all soil types.', price: 800, priceUnit: 'per_hour', rating: 4.6, totalBookings: 128, image: 'https://images.unsplash.com/photo-1530267981375-f0de937f5f13?w=400', providerId: 'sp1', providerName: 'Raj Farm Equipment', availability: true },
+  { id: 'as2', name: 'Harvester on Demand', category: 'equipment-rental', description: 'Combined harvester for wheat, rice, and other crops. GPS-guided precision cutting.', price: 1500, priceUnit: 'per_acre', rating: 4.8, totalBookings: 95, image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400', providerId: 'sp1', providerName: 'Raj Farm Equipment', availability: true },
+  { id: 'as3', name: 'Soil Health Testing', category: 'soil-testing', description: 'Complete soil analysis — pH, NPK, micronutrients, organic carbon. Report in 48 hours.', price: 500, priceUnit: 'per_visit', rating: 4.7, totalBookings: 210, image: 'https://images.unsplash.com/photo-1574943320219-553eb213f72d?w=400', providerId: 'sp2', providerName: 'Krishi Lab Services', availability: true },
+  { id: 'as4', name: 'Water Quality Analysis', category: 'soil-testing', description: 'Irrigation water testing for TDS, hardness, pH and contaminants. Lab-certified results.', price: 350, priceUnit: 'per_visit', rating: 4.5, totalBookings: 67, image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400', providerId: 'sp2', providerName: 'Krishi Lab Services', availability: true },
+  { id: 'as5', name: 'Drone Spraying Service', category: 'spraying', description: 'Precision drone-based pesticide/fungicide spraying. Covers 10 acres per hour. Uniform coverage.', price: 600, priceUnit: 'per_acre', rating: 4.9, totalBookings: 340, image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=400', providerId: 'sp3', providerName: 'AgriDrone Solutions', availability: true },
+  { id: 'as6', name: 'Manual Pest Control', category: 'spraying', description: 'Professional manual spraying for small to medium farms. Includes pesticide supply.', price: 400, priceUnit: 'per_acre', rating: 4.3, totalBookings: 156, image: 'https://images.unsplash.com/photo-1592921870789-04563d55041c?w=400', providerId: 'sp3', providerName: 'AgriDrone Solutions', availability: false },
+  { id: 'as7', name: 'Harvesting Crew', category: 'harvesting', description: 'Experienced 5-person harvesting team for vegetables, fruits, and field crops.', price: 2000, priceUnit: 'per_acre', rating: 4.4, totalBookings: 89, image: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=400', providerId: 'sp4', providerName: 'Kisan Manpower', availability: true },
+  { id: 'as8', name: 'Seasonal Labor Booking', category: 'harvesting', description: 'Book daily-wage farm laborers for sowing, weeding, and general farm work.', price: 500, priceUnit: 'per_hour', rating: 4.2, totalBookings: 245, image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?w=400', providerId: 'sp4', providerName: 'Kisan Manpower', availability: true },
+];
+
+const seedServiceBookings: ServiceBooking[] = [
+  { id: 'sb1', serviceId: 'as5', serviceName: 'Drone Spraying Service', category: 'spraying', farmerId: 'farmer-001', farmerName: 'Ramesh Kumar', providerId: 'sp3', providerName: 'AgriDrone Solutions', status: 'completed', scheduledDate: '2026-01-10', scheduledTime: '08:00', location: 'Village Rampur, Jaipur', acres: 5, totalAmount: 3000, paymentStatus: 'paid', paymentMethod: 'upi', rating: 5, review: 'Excellent service! Very precise spraying.', createdAt: '2026-01-08T10:00:00Z', updatedAt: '2026-01-10T16:00:00Z' },
+  { id: 'sb2', serviceId: 'as3', serviceName: 'Soil Health Testing', category: 'soil-testing', farmerId: 'farmer-001', farmerName: 'Ramesh Kumar', providerId: 'sp2', providerName: 'Krishi Lab Services', status: 'confirmed', scheduledDate: '2026-03-20', scheduledTime: '10:00', location: 'Village Rampur, Jaipur', totalAmount: 500, paymentStatus: 'pending', paymentMethod: 'cod', createdAt: '2026-03-12T09:00:00Z', updatedAt: '2026-03-13T11:00:00Z' },
+  { id: 'sb3', serviceId: 'as1', serviceName: 'Tractor Rental - Ploughing', category: 'equipment-rental', farmerId: 'farmer-001', farmerName: 'Ramesh Kumar', providerId: 'sp1', providerName: 'Raj Farm Equipment', status: 'pending', scheduledDate: '2026-03-25', scheduledTime: '07:00', location: 'Village Rampur, Jaipur', totalAmount: 2400, paymentStatus: 'pending', paymentMethod: 'online', createdAt: '2026-03-14T08:00:00Z', updatedAt: '2026-03-14T08:00:00Z' },
+];
+
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [diagnoses, setDiagnoses] = useLocalStorage<Diagnosis[]>('kishu-diagnoses', seedDiagnoses);
   const [products, setProducts] = useLocalStorage<Product[]>('kishu-products', seedProducts);
@@ -824,6 +888,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [trackedCrops, setTrackedCrops] = useLocalStorage<TrackedCrop[]>('kishu-tracked-crops', []);
   const [expertApplications, setExpertApplications] = useLocalStorage<ExpertApplication[]>('kishu-expert-applications', seedExpertApplications);
   const [dealerKYCs, setDealerKYCs] = useLocalStorage<DealerKYC[]>('kishu-dealer-kycs', seedDealerKYCs);
+  const [agriServices] = useLocalStorage<AgriService[]>('kishu-agri-services', seedAgriServices);
+  const [serviceBookings, setServiceBookings] = useLocalStorage<ServiceBooking[]>('kishu-service-bookings', seedServiceBookings);
   const [wishlist, setWishlist] = useLocalStorage<string[]>('kishu-wishlist', []);
 
   // Diagnoses
@@ -1430,6 +1496,30 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return products.filter(p => wishlist.includes(p.id));
   }, [products, wishlist]);
 
+  // Agri Service Bookings
+  const addServiceBooking = useCallback((booking: Omit<ServiceBooking, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const now = new Date().toISOString();
+    const newBooking: ServiceBooking = {
+      ...booking,
+      id: `sb${Date.now()}`,
+      createdAt: now,
+      updatedAt: now,
+    };
+    setServiceBookings(prev => [newBooking, ...prev]);
+  }, [setServiceBookings]);
+
+  const updateBookingStatusFn = useCallback((id: string, status: ServiceBooking['status']) => {
+    setServiceBookings(prev => prev.map(b =>
+      b.id === id ? { ...b, status, updatedAt: new Date().toISOString() } : b
+    ));
+  }, [setServiceBookings]);
+
+  const rateService = useCallback((bookingId: string, rating: number, review?: string) => {
+    setServiceBookings(prev => prev.map(b =>
+      b.id === bookingId ? { ...b, rating, review, updatedAt: new Date().toISOString() } : b
+    ));
+  }, [setServiceBookings]);
+
   return (
     <DataContext.Provider value={{
       diagnoses, addDiagnosis, deleteDiagnosis, toggleBookmark,
@@ -1452,6 +1542,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       expertApplications, applyForExpert, approveExpert, rejectExpert, getExpertApplication,
       dealerKYCs, submitDealerKYC, approveDealerKYC, rejectDealerKYC, getDealerKYC,
       wishlist, toggleWishlist, isWishlisted, getWishlistProducts,
+      agriServices, serviceBookings, addServiceBooking,
+      updateBookingStatus: updateBookingStatusFn, rateService,
     }}>
       {children}
     </DataContext.Provider>

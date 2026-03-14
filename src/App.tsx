@@ -67,6 +67,12 @@ import OrderManagement from "./pages/dealer/OrderManagement";
 import BuyerProfile from "./pages/BuyerProfile";
 import NotFound from "./pages/NotFound";
 import Wishlist from "./pages/Wishlist";
+import AgriServices from "./pages/agri-services/AgriServices";
+import ServiceDetail from "./pages/agri-services/ServiceDetail";
+import BookService from "./pages/agri-services/BookService";
+import MyBookings from "./pages/agri-services/MyBookings";
+import BookingDetail from "./pages/agri-services/BookingDetail";
+import Home from "./pages/Home";
 
 const queryClient = new QueryClient();
 
@@ -142,6 +148,12 @@ const App = () => (
                 <Route path="/dealer/orders" element={<OrderManagement />} />
                 <Route path="/buyer/:id" element={<BuyerProfile />} />
                 <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/agri-services" element={<AgriServices />} />
+                <Route path="/agri-services/:id" element={<ServiceDetail />} />
+                <Route path="/agri-services/:id/book" element={<BookService />} />
+                <Route path="/my-bookings" element={<MyBookings />} />
+                <Route path="/my-bookings/:id" element={<BookingDetail />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
