@@ -94,6 +94,45 @@ export interface TrackedCrop {
   createdAt: string;
 }
 
+// Agri Service Types
+export interface AgriService {
+  id: string;
+  name: string;
+  category: 'equipment-rental' | 'soil-testing' | 'spraying' | 'harvesting' | 'other';
+  description: string;
+  price: number;
+  priceUnit: 'per_hour' | 'per_acre' | 'per_visit' | 'fixed';
+  rating: number;
+  totalBookings: number;
+  image: string;
+  providerId: string;
+  providerName: string;
+  availability: boolean;
+}
+
+export interface ServiceBooking {
+  id: string;
+  serviceId: string;
+  serviceName: string;
+  category: string;
+  farmerId: string;
+  farmerName: string;
+  providerId: string;
+  providerName: string;
+  status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'disputed';
+  scheduledDate: string;
+  scheduledTime: string;
+  location: string;
+  acres?: number;
+  totalAmount: number;
+  paymentStatus: 'pending' | 'paid' | 'refunded';
+  paymentMethod: 'cod' | 'online' | 'upi';
+  rating?: number;
+  review?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Expert Types
 export interface ExpertApplication {
   id: string;

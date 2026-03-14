@@ -1,5 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigate } from 'react-router-dom';
+import Home from './Home';
 import FarmerDashboard from './dashboard/FarmerDashboard';
 import DealerDashboard from './dashboard/DealerDashboard';
 import AdminDashboard from './dashboard/AdminDashboard';
@@ -15,9 +15,9 @@ const Index = () => {
     );
   }
 
-  // If not logged in, show farmer dashboard as guest
+  // If not logged in, show public home page
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return <Home />;
   }
 
   // Role-based dashboard routing
