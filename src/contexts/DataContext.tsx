@@ -445,6 +445,13 @@ interface DataContextType {
   rejectDealerKYC: (kycId: string, dealerId: string, adminId: string, reason: string) => void;
   getDealerKYC: (dealerId: string) => DealerKYC | undefined;
 
+  // Agri Services
+  agriServices: AgriService[];
+  serviceBookings: ServiceBooking[];
+  addServiceBooking: (booking: Omit<ServiceBooking, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateBookingStatus: (id: string, status: ServiceBooking['status']) => void;
+  rateService: (bookingId: string, rating: number, review?: string) => void;
+
   // Wishlist
   wishlist: string[];
   toggleWishlist: (productId: string) => void;
