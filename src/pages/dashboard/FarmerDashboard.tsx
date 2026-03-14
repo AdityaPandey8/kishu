@@ -58,6 +58,24 @@ const FarmerDashboard = () => {
         </div>
 
 
+        {/* Agri Services Quick Card */}
+        <motion.div
+          variants={staggerItem}
+          onClick={() => window.location.href = '/agri-services'}
+          className="bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 rounded-2xl p-4 cursor-pointer hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <span className="text-2xl">🚜</span>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-foreground">Agri Services</h3>
+              <p className="text-xs text-muted-foreground">Book equipment, spraying, soil testing & more</p>
+            </div>
+            <span className="text-primary font-bold text-sm">→</span>
+          </div>
+        </motion.div>
+
         {/* App Suggests */}
         <AppSuggests />
 

@@ -13,8 +13,8 @@ export const BottomNav = () => {
 
   const farmerNavItems = [
     { key: 'home', icon: Home, path: '/', label: t('nav.home') },
+    { key: 'services', icon: Wrench, path: '/agri-services', label: 'Services' },
     { key: 'shop', icon: ShoppingBag, path: '/shop', label: 'Shop' },
-    { key: 'reels', icon: Play, path: '/reels', label: 'Reels' },
     { key: 'community', icon: Users, path: '/community', label: 'Community' },
     { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
   ];
