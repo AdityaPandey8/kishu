@@ -46,6 +46,7 @@ export const BottomNav = () => {
     switch (user?.role) {
       case 'dealer': return dealerNavItems;
       case 'admin': return adminNavItems;
+      case 'service_provider': return providerNavItems;
       default: return farmerNavItems;
     }
   };

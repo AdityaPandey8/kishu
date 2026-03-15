@@ -3,6 +3,9 @@ import Home from './Home';
 import FarmerDashboard from './dashboard/FarmerDashboard';
 import DealerDashboard from './dashboard/DealerDashboard';
 import AdminDashboard from './dashboard/AdminDashboard';
+import ProviderDashboard from './dashboard/ProviderDashboard';
+import ProviderPending from './provider/ProviderPending';
+import ProviderRejected from './provider/ProviderRejected';
 
 const Index = () => {
   const { user, isLoading } = useAuth();
@@ -15,17 +18,19 @@ const Index = () => {
     );
   }
 
-  // If not logged in, show public home page
   if (!user) {
     return <Home />;
   }
 
-  // Role-based dashboard routing
   switch (user.role) {
     case 'dealer':
       return <DealerDashboard />;
     case 'admin':
       return <AdminDashboard />;
+    case 'service_provider':
+      if (user.providerStatus === 'pending') return <ProviderPending />;
+      if (user.providerStatus === 'rejected') return <ProviderRejected />;
+      return <ProviderDashboard />;
     default:
       return <FarmerDashboard />;
   }
