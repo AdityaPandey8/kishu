@@ -142,7 +142,7 @@ const AdminDashboard = () => {
             <Activity className="h-4 w-4 text-primary" />
             {isHindi ? 'त्वरित कार्य' : 'Quick Actions'}
           </h2>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {quickActions.map((action, i) => {
               const Icon = action.icon;
               return (

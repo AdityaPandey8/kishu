@@ -5,10 +5,11 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { useData } from '@/contexts/DataContext';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, FileText, Play, Trash2, Eye, MessageSquare, Heart, Search } from 'lucide-react';
+import { ArrowLeft, FileText, Play, Trash2, Eye, MessageSquare, Heart, Search, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const AdminContent = () => {
   const { i18n } = useTranslation();
@@ -17,19 +18,14 @@ const AdminContent = () => {
   const isHindi = i18n.language === 'hi';
   const [tab, setTab] = useState<'posts' | 'reels'>('posts');
   const [search, setSearch] = useState('');
+  const [previewPost, setPreviewPost] = useState<typeof posts[0] | null>(null);
+  const [previewReel, setPreviewReel] = useState<typeof reels[0] | null>(null);
 
   const filteredPosts = posts.filter(p => !search || p.content.toLowerCase().includes(search.toLowerCase()) || p.authorName.toLowerCase().includes(search.toLowerCase()));
   const filteredReels = reels.filter(r => !search || r.caption.toLowerCase().includes(search.toLowerCase()) || r.creatorName.toLowerCase().includes(search.toLowerCase()));
 
-  const handleDeletePost = (id: string) => {
-    deletePost(id);
-    toast.success('Post deleted');
-  };
-
-  const handleDeleteReel = (id: string) => {
-    deleteReel(id);
-    toast.success('Reel deleted');
-  };
+  const handleDeletePost = (id: string) => { deletePost(id); toast.success('Post deleted'); };
+  const handleDeleteReel = (id: string) => { deleteReel(id); toast.success('Reel deleted'); };
 
   return (
     <AppLayout>
@@ -62,13 +58,7 @@ const AdminContent = () => {
               </div>
             )}
             {filteredPosts.map((post, i) => (
-              <motion.div
-                key={post.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
-                className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-2"
-              >
+              <motion.div key={post.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }} className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-2">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="font-medium text-foreground text-sm">{post.authorName}</p>
@@ -82,9 +72,14 @@ const AdminContent = () => {
                   <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3" /> {post.comments.length}</span>
                   <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {post.shares}</span>
                 </div>
-                <Button variant="destructive" size="sm" className="text-xs rounded-lg w-full" onClick={() => handleDeletePost(post.id)}>
-                  <Trash2 className="h-3 w-3 mr-1" /> Delete Post
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="text-xs rounded-lg flex-1" onClick={() => setPreviewPost(post)}>
+                    <Eye className="h-3 w-3 mr-1" /> View
+                  </Button>
+                  <Button variant="destructive" size="sm" className="text-xs rounded-lg flex-1" onClick={() => handleDeletePost(post.id)}>
+                    <Trash2 className="h-3 w-3 mr-1" /> Delete
+                  </Button>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -99,13 +94,7 @@ const AdminContent = () => {
               </div>
             )}
             {filteredReels.map((reel, i) => (
-              <motion.div
-                key={reel.id}
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
-                className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-2"
-              >
+              <motion.div key={reel.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }} className="bg-card border border-border rounded-2xl p-4 shadow-sm space-y-2">
                 <div className="flex items-start justify-between">
                   <div>
                     <p className="font-medium text-foreground text-sm">{reel.creatorName}</p>
@@ -119,14 +108,79 @@ const AdminContent = () => {
                   <span className="flex items-center gap-1"><MessageSquare className="h-3 w-3" /> {reel.comments.length}</span>
                   <span className="flex items-center gap-1"><Eye className="h-3 w-3" /> {reel.views}</span>
                 </div>
-                <Button variant="destructive" size="sm" className="text-xs rounded-lg w-full" onClick={() => handleDeleteReel(reel.id)}>
-                  <Trash2 className="h-3 w-3 mr-1" /> Delete Reel
-                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="text-xs rounded-lg flex-1" onClick={() => setPreviewReel(reel)}>
+                    <Eye className="h-3 w-3 mr-1" /> View
+                  </Button>
+                  <Button variant="destructive" size="sm" className="text-xs rounded-lg flex-1" onClick={() => handleDeleteReel(reel.id)}>
+                    <Trash2 className="h-3 w-3 mr-1" /> Delete
+                  </Button>
+                </div>
               </motion.div>
             ))}
           </div>
         )}
       </motion.div>
+
+      {/* Post Preview Dialog */}
+      <Dialog open={!!previewPost} onOpenChange={() => setPreviewPost(null)}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Post by {previewPost?.authorName}</DialogTitle>
+          </DialogHeader>
+          {previewPost && (
+            <div className="space-y-3">
+              <p className="text-sm text-foreground">{previewPost.content}</p>
+              {previewPost.imageUrl && <img src={previewPost.imageUrl} alt="Post" className="w-full rounded-xl" />}
+              {previewPost.videoUrl && (
+                <video src={previewPost.videoUrl} controls className="w-full rounded-xl" />
+              )}
+              {previewPost.comments.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-border">
+                  <p className="text-xs font-medium text-foreground">Comments ({previewPost.comments.length})</p>
+                  {previewPost.comments.map(c => (
+                    <div key={c.id} className="text-xs">
+                      <span className="font-medium text-foreground">{c.authorName}: </span>
+                      <span className="text-muted-foreground">{c.content}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Reel Preview Dialog */}
+      <Dialog open={!!previewReel} onOpenChange={() => setPreviewReel(null)}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-sm">Reel by {previewReel?.creatorName}</DialogTitle>
+          </DialogHeader>
+          {previewReel && (
+            <div className="space-y-3">
+              <video src={previewReel.videoUrl} controls className="w-full rounded-xl aspect-[9/16] object-cover" />
+              <p className="text-sm text-foreground">{previewReel.caption}</p>
+              <div className="flex gap-3 text-xs text-muted-foreground">
+                <span>❤️ {previewReel.likes.length}</span>
+                <span>💬 {previewReel.comments.length}</span>
+                <span>👁️ {previewReel.views}</span>
+              </div>
+              {previewReel.comments.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-border">
+                  <p className="text-xs font-medium text-foreground">Comments</p>
+                  {previewReel.comments.map(c => (
+                    <div key={c.id} className="text-xs">
+                      <span className="font-medium text-foreground">{c.userName}: </span>
+                      <span className="text-muted-foreground">{c.content}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 };
