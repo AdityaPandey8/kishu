@@ -35,6 +35,9 @@ export interface User {
   storeDescription?: string;
   storeLogo?: string;
   operatingHours?: { open: string; close: string; days: string[] };
+  // Service provider fields
+  providerStatus?: 'pending' | 'approved' | 'rejected';
+  businessCategory?: string;
 }
 
 interface LoginResult {
