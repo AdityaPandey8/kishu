@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type UserRole = 'farmer' | 'dealer' | 'admin';
+export type UserRole = 'farmer' | 'dealer' | 'admin' | 'service_provider';
 export type KYCStatus = 'not_submitted' | 'pending' | 'approved' | 'rejected';
 
 export interface UserCoordinates {
