@@ -28,9 +28,11 @@ const AdminDashboard = () => {
   // Live stats
   const farmers = platformUsers.filter(u => u.role === 'farmer');
   const dealers = platformUsers.filter(u => u.role === 'dealer');
+  const providers = platformUsers.filter(u => u.role === 'service_provider');
   const totalRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
   const pendingKYC = dealerKYCs.filter(k => k.status === 'pending').length;
   const pendingExperts = expertApplications.filter(a => a.status === 'pending').length;
+  const pendingProviders = providers.filter(p => p.status === 'pending').length;
 
   const stats = [
     { label: isHindi ? 'किसान' : 'Farmers', value: farmers.length, icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
