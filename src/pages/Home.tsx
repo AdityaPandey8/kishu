@@ -51,7 +51,8 @@ const stats = [
 
 const Home = () => {
   const navigate = useNavigate();
-
+  const { i18n } = useTranslation();
+  const { settings, toggleDarkMode } = useSettings();
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Hero Section */}
