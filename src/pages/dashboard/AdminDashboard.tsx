@@ -19,7 +19,8 @@ const AdminDashboard = () => {
   const { user } = useAuth();
   const { 
     platformUsers, products, orders, inquiries, 
-    notifications, expertApplications, dealerKYCs, posts, reels 
+    notifications, expertApplications, dealerKYCs, posts, reels,
+    serviceBookings, agriServices
   } = useData();
   const navigate = useNavigate();
   const isHindi = i18n.language === 'hi';
