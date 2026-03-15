@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Camera, User, Users, Package, MessageSquare, TrendingUp, ShoppingBag, Play, Wrench } from 'lucide-react';
+import { Home, Camera, User, Users, Package, MessageSquare, TrendingUp, ShoppingBag, Play, Wrench, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
