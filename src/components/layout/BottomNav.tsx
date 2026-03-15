@@ -35,6 +35,13 @@ export const BottomNav = () => {
     { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
   ];
 
+  const providerNavItems = [
+    { key: 'home', icon: Home, path: '/', label: 'Dashboard' },
+    { key: 'bookings', icon: Calendar, path: '/', label: 'Bookings' },
+    { key: 'services', icon: Wrench, path: '/agri-services', label: 'Services' },
+    { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
+  ];
+
   const getNavItems = () => {
     switch (user?.role) {
       case 'dealer': return dealerNavItems;
