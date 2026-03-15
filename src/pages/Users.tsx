@@ -182,7 +182,7 @@ const Users = () => {
         ) : (
           <div className="space-y-2">
             {filteredUsers.map((user, index) => {
-              const role = roleConfig[user.role];
+              const role = roleConfig[user.role] || roleConfig.farmer;
               const status = statusConfig[user.status];
               const RoleIcon = role.icon;
               const StatusIcon = status.icon;
@@ -194,9 +194,10 @@ const Users = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + index * 0.03 }}
                   className={cn(
-                    'bg-card border border-border rounded-xl p-4 shadow-soft',
+                    'bg-card border border-border rounded-xl p-4 shadow-soft cursor-pointer',
                     user.status === 'pending' && 'border-l-4 border-l-amber-500'
                   )}
+                  onClick={() => navigate(`/admin/users/${user.id}`)}
                 >
                   <div className="flex items-start gap-3">
                     <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center', role.color)}>

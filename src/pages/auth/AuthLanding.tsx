@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Leaf, Tractor, Store, Shield, ArrowRight } from 'lucide-react';
+import { Leaf, Tractor, Store, Shield, ArrowRight, Wrench } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const roles = [
