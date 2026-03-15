@@ -20,10 +20,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 
-const roleConfig = {
+const roleConfig: Record<string, { icon: typeof Leaf; label: string; labelHi: string; color: string }> = {
   farmer: { icon: Leaf, label: 'Farmer', labelHi: 'किसान', color: 'bg-green-100 text-green-700' },
   dealer: { icon: Store, label: 'Dealer', labelHi: 'डीलर', color: 'bg-purple-100 text-purple-700' },
   admin: { icon: Shield, label: 'Admin', labelHi: 'एडमिन', color: 'bg-blue-100 text-blue-700' },
+  service_provider: { icon: Leaf, label: 'Provider', labelHi: 'सेवा प्रदाता', color: 'bg-teal-100 text-teal-700' },
 };
 
 const statusConfig = {
@@ -39,7 +40,7 @@ const Users = () => {
   const isHindi = i18n.language === 'hi';
   
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeRoleFilter, setActiveRoleFilter] = useState<'all' | 'farmer' | 'dealer' | 'admin'>('all');
+  const [activeRoleFilter, setActiveRoleFilter] = useState<'all' | 'farmer' | 'dealer' | 'admin' | 'service_provider'>('all');
   const [activeStatusFilter, setActiveStatusFilter] = useState<'all' | 'active' | 'suspended' | 'pending'>('all');
 
   const filteredUsers = platformUsers.filter(u => {
@@ -181,7 +182,7 @@ const Users = () => {
         ) : (
           <div className="space-y-2">
             {filteredUsers.map((user, index) => {
-              const role = roleConfig[user.role];
+              const role = roleConfig[user.role] || roleConfig.farmer;
               const status = statusConfig[user.status];
               const RoleIcon = role.icon;
               const StatusIcon = status.icon;
@@ -193,9 +194,10 @@ const Users = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 + index * 0.03 }}
                   className={cn(
-                    'bg-card border border-border rounded-xl p-4 shadow-soft',
+                    'bg-card border border-border rounded-xl p-4 shadow-soft cursor-pointer',
                     user.status === 'pending' && 'border-l-4 border-l-amber-500'
                   )}
+                  onClick={() => navigate(`/admin/users/${user.id}`)}
                 >
                   <div className="flex items-start gap-3">
                     <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center', role.color)}>

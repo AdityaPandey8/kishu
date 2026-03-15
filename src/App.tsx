@@ -73,6 +73,13 @@ import BookService from "./pages/agri-services/BookService";
 import MyBookings from "./pages/agri-services/MyBookings";
 import BookingDetail from "./pages/agri-services/BookingDetail";
 import Home from "./pages/Home";
+import ProviderLogin from "./pages/auth/ProviderLogin";
+import ProviderSignup from "./pages/auth/ProviderSignup";
+import ProviderPending from "./pages/provider/ProviderPending";
+import ProviderRejected from "./pages/provider/ProviderRejected";
+import AdminServiceProviders from "./pages/admin/AdminServiceProviders";
+import AdminServices from "./pages/admin/AdminServices";
+import UserDetail from "./pages/admin/UserDetail";
 
 const queryClient = new QueryClient();
 
@@ -154,6 +161,15 @@ const App = () => (
                 <Route path="/agri-services/:id/book" element={<BookService />} />
                 <Route path="/my-bookings" element={<MyBookings />} />
                 <Route path="/my-bookings/:id" element={<BookingDetail />} />
+                {/* Provider auth */}
+                <Route path="/auth/provider/login" element={<ProviderLogin />} />
+                <Route path="/auth/provider/signup" element={<ProviderSignup />} />
+                <Route path="/provider/pending" element={<ProviderPending />} />
+                <Route path="/provider/rejected" element={<ProviderRejected />} />
+                {/* Admin management */}
+                <Route path="/admin/service-providers" element={<AdminServiceProviders />} />
+                <Route path="/admin/services" element={<AdminServices />} />
+                <Route path="/admin/users/:id" element={<UserDetail />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

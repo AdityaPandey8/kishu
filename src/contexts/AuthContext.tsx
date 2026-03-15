@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type UserRole = 'farmer' | 'dealer' | 'admin';
+export type UserRole = 'farmer' | 'dealer' | 'admin' | 'service_provider';
 export type KYCStatus = 'not_submitted' | 'pending' | 'approved' | 'rejected';
 
 export interface UserCoordinates {
@@ -35,6 +35,9 @@ export interface User {
   storeDescription?: string;
   storeLogo?: string;
   operatingHours?: { open: string; close: string; days: string[] };
+  // Service provider fields
+  providerStatus?: 'pending' | 'approved' | 'rejected';
+  businessCategory?: string;
 }
 
 interface LoginResult {
@@ -103,6 +106,16 @@ const DEMO_ACCOUNTS: Record<string, User> = {
     phone: '+91 99999 00000',
     location: 'Mumbai, India',
   },
+  'provider@kishu.com': {
+    id: 'provider-001',
+    email: 'provider@kishu.com',
+    name: 'Raj Farm Equipment',
+    role: 'service_provider',
+    phone: '+91 88888 77777',
+    location: 'Jaipur, Rajasthan',
+    providerStatus: 'approved',
+    businessCategory: 'equipment-rental',
+  },
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -133,6 +146,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let role: UserRole = 'farmer';
     if (lowerEmail.includes('dealer')) role = 'dealer';
     if (lowerEmail.includes('admin')) role = 'admin';
+    if (lowerEmail.includes('provider')) role = 'service_provider';
     
     const mockUser: User = {
       id: Date.now().toString(),
@@ -143,6 +157,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       crops: ['Wheat', 'Rice'],
       // New dealers need KYC
       ...(role === 'dealer' && { kycStatus: 'not_submitted' as KYCStatus }),
+      ...(role === 'service_provider' && { providerStatus: 'pending' as const }),
     };
     
     setUser(mockUser);
@@ -162,6 +177,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       location: 'India',
       // Dealers start with not_submitted KYC status
       ...(data.role === 'dealer' && { kycStatus: 'not_submitted' as KYCStatus }),
+      ...(data.role === 'service_provider' && { providerStatus: 'pending' as const }),
     };
     
     setUser(newUser);
@@ -205,5 +221,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const DEMO_CREDENTIALS = [
   { role: 'Farmer', email: 'farmer@kishu.com', password: 'demo123', icon: '🧑‍🌾' },
   { role: 'Dealer', email: 'dealer@kishu.com', password: 'demo123', icon: '🏪' },
+  { role: 'Provider', email: 'provider@kishu.com', password: 'demo123', icon: '🔧' },
   { role: 'Admin', email: 'admin@kishu.com', password: 'demo123', icon: '🛡️' },
 ];

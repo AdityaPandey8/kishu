@@ -266,7 +266,7 @@ export interface PlatformUser {
   id: string;
   email: string;
   name: string;
-  role: 'farmer' | 'dealer' | 'admin';
+  role: 'farmer' | 'dealer' | 'admin' | 'service_provider';
   status: 'active' | 'suspended' | 'pending';
   createdAt: string;
   lastActive: string;
@@ -541,6 +541,9 @@ const seedPlatformUsers: PlatformUser[] = [
   { id: 'f3', email: 'mohan@email.com', name: 'Mohan Singh', role: 'farmer', status: 'active', createdAt: 'Jan 8, 2026', lastActive: '2 days ago', location: 'Bhopal, MP' },
   { id: 'd2', email: 'greenfarmsupply@email.com', name: 'Green Farm Supplies', role: 'dealer', status: 'active', createdAt: 'Jan 12, 2026', lastActive: 'Jan 12, 2026', location: 'Pune, MH' },
   { id: 'd3', email: 'agrisolutions@email.com', name: 'Agri Solutions Pvt Ltd', role: 'dealer', status: 'pending', createdAt: 'Jan 14, 2026', lastActive: 'Jan 14, 2026', location: 'Mumbai, MH' },
+  { id: 'provider-001', email: 'provider@kishu.com', name: 'Raj Farm Equipment', role: 'service_provider', status: 'active', createdAt: 'Dec 15, 2025', lastActive: 'Today', location: 'Jaipur, RJ' },
+  { id: 'sp2', email: 'krishilab@email.com', name: 'Krishi Lab Services', role: 'service_provider', status: 'active', createdAt: 'Jan 2, 2026', lastActive: 'Yesterday', location: 'Delhi' },
+  { id: 'sp-pending', email: 'newprovider@email.com', name: 'New Agri Services', role: 'service_provider', status: 'pending', createdAt: 'Mar 10, 2026', lastActive: 'Mar 10, 2026', location: 'Pune, MH' },
 ];
 
 // CRM Seed Data

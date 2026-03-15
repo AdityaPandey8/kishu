@@ -1,11 +1,31 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useSettings } from '@/contexts/SettingsContext';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Leaf, CloudSun, Users, Wrench, ShoppingBag, Play,
   ScanLine, ArrowRight, Globe, Smartphone, Shield,
-  CheckCircle2, ChevronDown
+  CheckCircle2, ChevronDown, Moon, Sun
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const languages = [
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'hi', label: 'हिंदी', flag: '🇮🇳' },
+  { code: 'ta', label: 'தமிழ்', flag: '🇮🇳' },
+  { code: 'te', label: 'తెలుగు', flag: '🇮🇳' },
+  { code: 'kn', label: 'ಕನ್ನಡ', flag: '🇮🇳' },
+  { code: 'ml', label: 'മലയാളം', flag: '🇮🇳' },
+  { code: 'bn', label: 'বাংলা', flag: '🇮🇳' },
+  { code: 'mr', label: 'मराठी', flag: '🇮🇳' },
+  { code: 'gu', label: 'ગુજરાતી', flag: '🇮🇳' },
+  { code: 'pa', label: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+  { code: 'or', label: 'ଓଡ଼ିଆ', flag: '🇮🇳' },
+];
 
 const features = [
   { icon: ScanLine, title: 'Crop Disease Detection', desc: 'AI-powered instant diagnosis from a photo of your crop', color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
@@ -31,9 +51,42 @@ const stats = [
 
 const Home = () => {
   const navigate = useNavigate();
-
+  const { i18n } = useTranslation();
+  const { settings, toggleDarkMode } = useSettings();
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* Top Bar with Dark Mode & Language */}
+      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/40">
+        <div className="container flex h-14 items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            <Leaf className="h-5 w-5 text-primary" />
+            <span className="font-bold text-foreground">Kishu</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={toggleDarkMode}>
+              {settings.darkMode ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-muted-foreground" />}
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-9 gap-1.5 px-2.5 rounded-xl">
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs font-medium uppercase">{i18n.language}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-[160px] rounded-xl max-h-[320px] overflow-y-auto">
+                {languages.map(lang => (
+                  <DropdownMenuItem key={lang.code} onClick={() => { i18n.changeLanguage(lang.code); localStorage.setItem('kishu-language', lang.code); }}
+                    className={cn('rounded-lg cursor-pointer', i18n.language === lang.code && 'bg-primary/10 text-primary')}>
+                    {lang.flag} {lang.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button size="sm" className="h-9 rounded-xl" onClick={() => navigate('/auth')}>Login</Button>
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 text-center">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-accent/5" />

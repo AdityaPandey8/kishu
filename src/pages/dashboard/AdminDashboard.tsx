@@ -19,7 +19,8 @@ const AdminDashboard = () => {
   const { user } = useAuth();
   const { 
     platformUsers, products, orders, inquiries, 
-    notifications, expertApplications, dealerKYCs, posts, reels 
+    notifications, expertApplications, dealerKYCs, posts, reels,
+    serviceBookings, agriServices
   } = useData();
   const navigate = useNavigate();
   const isHindi = i18n.language === 'hi';
@@ -27,9 +28,11 @@ const AdminDashboard = () => {
   // Live stats
   const farmers = platformUsers.filter(u => u.role === 'farmer');
   const dealers = platformUsers.filter(u => u.role === 'dealer');
+  const providers = platformUsers.filter(u => u.role === 'service_provider');
   const totalRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0);
   const pendingKYC = dealerKYCs.filter(k => k.status === 'pending').length;
   const pendingExperts = expertApplications.filter(a => a.status === 'pending').length;
+  const pendingProviders = providers.filter(p => p.status === 'pending').length;
 
   const stats = [
     { label: isHindi ? 'किसान' : 'Farmers', value: farmers.length, icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
@@ -46,6 +49,8 @@ const AdminDashboard = () => {
     { label: isHindi ? 'KYC अनुमोदन' : 'KYC Approvals', icon: FileText, path: '/admin/kyc', count: pendingKYC, urgent: pendingKYC > 0 },
     { label: isHindi ? 'विशेषज्ञ' : 'Experts', icon: Shield, path: '/admin/experts', count: pendingExperts, urgent: pendingExperts > 0 },
     { label: isHindi ? 'ऑर्डर' : 'Orders', icon: Truck, path: '/admin/orders', count: orders.length },
+    { label: isHindi ? 'सेवा प्रदाता' : 'Providers', icon: Activity, path: '/admin/service-providers', count: providers.length, urgent: pendingProviders > 0 },
+    { label: isHindi ? 'सेवाएं' : 'Services', icon: Package, path: '/admin/services', count: agriServices.length },
     { label: isHindi ? 'पूछताछ' : 'Inquiries', icon: MessageSquare, path: '/admin/inquiries', count: inquiries.length },
     { label: isHindi ? 'सामग्री' : 'Content', icon: Eye, path: '/admin/content', count: posts.length + reels.length },
   ];
@@ -137,7 +142,7 @@ const AdminDashboard = () => {
             <Activity className="h-4 w-4 text-primary" />
             {isHindi ? 'त्वरित कार्य' : 'Quick Actions'}
           </h2>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-4 gap-2">
             {quickActions.map((action, i) => {
               const Icon = action.icon;
               return (

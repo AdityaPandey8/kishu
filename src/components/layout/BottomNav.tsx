@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Camera, User, Users, Package, MessageSquare, TrendingUp, ShoppingBag, Play, Wrench } from 'lucide-react';
+import { Home, Camera, User, Users, Package, MessageSquare, TrendingUp, ShoppingBag, Play, Wrench, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -35,10 +35,18 @@ export const BottomNav = () => {
     { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
   ];
 
+  const providerNavItems = [
+    { key: 'home', icon: Home, path: '/', label: 'Dashboard' },
+    { key: 'bookings', icon: Calendar, path: '/', label: 'Bookings' },
+    { key: 'services', icon: Wrench, path: '/agri-services', label: 'Services' },
+    { key: 'profile', icon: User, path: '/profile', label: t('nav.profile') },
+  ];
+
   const getNavItems = () => {
     switch (user?.role) {
       case 'dealer': return dealerNavItems;
       case 'admin': return adminNavItems;
+      case 'service_provider': return providerNavItems;
       default: return farmerNavItems;
     }
   };
