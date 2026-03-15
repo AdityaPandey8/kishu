@@ -106,6 +106,16 @@ const DEMO_ACCOUNTS: Record<string, User> = {
     phone: '+91 99999 00000',
     location: 'Mumbai, India',
   },
+  'provider@kishu.com': {
+    id: 'provider-001',
+    email: 'provider@kishu.com',
+    name: 'Raj Farm Equipment',
+    role: 'service_provider',
+    phone: '+91 88888 77777',
+    location: 'Jaipur, Rajasthan',
+    providerStatus: 'approved',
+    businessCategory: 'equipment-rental',
+  },
 };
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
