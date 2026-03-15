@@ -146,6 +146,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let role: UserRole = 'farmer';
     if (lowerEmail.includes('dealer')) role = 'dealer';
     if (lowerEmail.includes('admin')) role = 'admin';
+    if (lowerEmail.includes('provider')) role = 'service_provider';
     
     const mockUser: User = {
       id: Date.now().toString(),
