@@ -20,10 +20,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
 
-const roleConfig = {
+const roleConfig: Record<string, { icon: typeof Leaf; label: string; labelHi: string; color: string }> = {
   farmer: { icon: Leaf, label: 'Farmer', labelHi: 'किसान', color: 'bg-green-100 text-green-700' },
   dealer: { icon: Store, label: 'Dealer', labelHi: 'डीलर', color: 'bg-purple-100 text-purple-700' },
   admin: { icon: Shield, label: 'Admin', labelHi: 'एडमिन', color: 'bg-blue-100 text-blue-700' },
+  service_provider: { icon: Leaf, label: 'Provider', labelHi: 'सेवा प्रदाता', color: 'bg-teal-100 text-teal-700' },
 };
 
 const statusConfig = {
