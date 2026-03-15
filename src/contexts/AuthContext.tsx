@@ -177,6 +177,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       location: 'India',
       // Dealers start with not_submitted KYC status
       ...(data.role === 'dealer' && { kycStatus: 'not_submitted' as KYCStatus }),
+      ...(data.role === 'service_provider' && { providerStatus: 'pending' as const }),
     };
     
     setUser(newUser);
