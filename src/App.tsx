@@ -161,6 +161,15 @@ const App = () => (
                 <Route path="/agri-services/:id/book" element={<BookService />} />
                 <Route path="/my-bookings" element={<MyBookings />} />
                 <Route path="/my-bookings/:id" element={<BookingDetail />} />
+                {/* Provider auth */}
+                <Route path="/auth/provider/login" element={<ProviderLogin />} />
+                <Route path="/auth/provider/signup" element={<ProviderSignup />} />
+                <Route path="/provider/pending" element={<ProviderPending />} />
+                <Route path="/provider/rejected" element={<ProviderRejected />} />
+                {/* Admin management */}
+                <Route path="/admin/service-providers" element={<AdminServiceProviders />} />
+                <Route path="/admin/services" element={<AdminServices />} />
+                <Route path="/admin/users/:id" element={<UserDetail />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
