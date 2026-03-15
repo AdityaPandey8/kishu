@@ -1,11 +1,31 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useSettings } from '@/contexts/SettingsContext';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Leaf, CloudSun, Users, Wrench, ShoppingBag, Play,
   ScanLine, ArrowRight, Globe, Smartphone, Shield,
-  CheckCircle2, ChevronDown
+  CheckCircle2, ChevronDown, Moon, Sun
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+const languages = [
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'hi', label: 'हिंदी', flag: '🇮🇳' },
+  { code: 'ta', label: 'தமிழ்', flag: '🇮🇳' },
+  { code: 'te', label: 'తెలుగు', flag: '🇮🇳' },
+  { code: 'kn', label: 'ಕನ್ನಡ', flag: '🇮🇳' },
+  { code: 'ml', label: 'മലയാളം', flag: '🇮🇳' },
+  { code: 'bn', label: 'বাংলা', flag: '🇮🇳' },
+  { code: 'mr', label: 'मराठी', flag: '🇮🇳' },
+  { code: 'gu', label: 'ગુજરાતી', flag: '🇮🇳' },
+  { code: 'pa', label: 'ਪੰਜਾਬੀ', flag: '🇮🇳' },
+  { code: 'or', label: 'ଓଡ଼ିଆ', flag: '🇮🇳' },
+];
 
 const features = [
   { icon: ScanLine, title: 'Crop Disease Detection', desc: 'AI-powered instant diagnosis from a photo of your crop', color: 'text-emerald-600', bg: 'bg-emerald-100 dark:bg-emerald-900/30' },
