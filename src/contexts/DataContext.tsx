@@ -266,7 +266,7 @@ export interface PlatformUser {
   id: string;
   email: string;
   name: string;
-  role: 'farmer' | 'dealer' | 'admin';
+  role: 'farmer' | 'dealer' | 'admin' | 'service_provider';
   status: 'active' | 'suspended' | 'pending';
   createdAt: string;
   lastActive: string;
