@@ -221,5 +221,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const DEMO_CREDENTIALS = [
   { role: 'Farmer', email: 'farmer@kishu.com', password: 'demo123', icon: '🧑‍🌾' },
   { role: 'Dealer', email: 'dealer@kishu.com', password: 'demo123', icon: '🏪' },
+  { role: 'Provider', email: 'provider@kishu.com', password: 'demo123', icon: '🔧' },
   { role: 'Admin', email: 'admin@kishu.com', password: 'demo123', icon: '🛡️' },
 ];
