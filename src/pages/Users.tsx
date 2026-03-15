@@ -40,7 +40,7 @@ const Users = () => {
   const isHindi = i18n.language === 'hi';
   
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeRoleFilter, setActiveRoleFilter] = useState<'all' | 'farmer' | 'dealer' | 'admin'>('all');
+  const [activeRoleFilter, setActiveRoleFilter] = useState<'all' | 'farmer' | 'dealer' | 'admin' | 'service_provider'>('all');
   const [activeStatusFilter, setActiveStatusFilter] = useState<'all' | 'active' | 'suspended' | 'pending'>('all');
 
   const filteredUsers = platformUsers.filter(u => {
