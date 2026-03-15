@@ -73,6 +73,13 @@ import BookService from "./pages/agri-services/BookService";
 import MyBookings from "./pages/agri-services/MyBookings";
 import BookingDetail from "./pages/agri-services/BookingDetail";
 import Home from "./pages/Home";
+import ProviderLogin from "./pages/auth/ProviderLogin";
+import ProviderSignup from "./pages/auth/ProviderSignup";
+import ProviderPending from "./pages/provider/ProviderPending";
+import ProviderRejected from "./pages/provider/ProviderRejected";
+import AdminServiceProviders from "./pages/admin/AdminServiceProviders";
+import AdminServices from "./pages/admin/AdminServices";
+import UserDetail from "./pages/admin/UserDetail";
 
 const queryClient = new QueryClient();
 
