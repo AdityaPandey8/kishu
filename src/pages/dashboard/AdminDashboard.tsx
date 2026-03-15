@@ -49,6 +49,8 @@ const AdminDashboard = () => {
     { label: isHindi ? 'KYC अनुमोदन' : 'KYC Approvals', icon: FileText, path: '/admin/kyc', count: pendingKYC, urgent: pendingKYC > 0 },
     { label: isHindi ? 'विशेषज्ञ' : 'Experts', icon: Shield, path: '/admin/experts', count: pendingExperts, urgent: pendingExperts > 0 },
     { label: isHindi ? 'ऑर्डर' : 'Orders', icon: Truck, path: '/admin/orders', count: orders.length },
+    { label: isHindi ? 'सेवा प्रदाता' : 'Providers', icon: Activity, path: '/admin/service-providers', count: providers.length, urgent: pendingProviders > 0 },
+    { label: isHindi ? 'सेवाएं' : 'Services', icon: Package, path: '/admin/services', count: agriServices.length },
     { label: isHindi ? 'पूछताछ' : 'Inquiries', icon: MessageSquare, path: '/admin/inquiries', count: inquiries.length },
     { label: isHindi ? 'सामग्री' : 'Content', icon: Eye, path: '/admin/content', count: posts.length + reels.length },
   ];
