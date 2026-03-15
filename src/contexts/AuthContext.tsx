@@ -157,6 +157,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       crops: ['Wheat', 'Rice'],
       // New dealers need KYC
       ...(role === 'dealer' && { kycStatus: 'not_submitted' as KYCStatus }),
+      ...(role === 'service_provider' && { providerStatus: 'pending' as const }),
     };
     
     setUser(mockUser);
