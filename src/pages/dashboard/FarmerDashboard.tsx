@@ -82,8 +82,6 @@ const FarmerDashboard = () => {
         {/* Expert Help */}
         <ExpertHelp />
 
-        {/* Recent Diagnoses */}
-        <RecentDiagnoses />
       </motion.div>
       <Suspense fallback={null}>
         <FarmingChatbot />
