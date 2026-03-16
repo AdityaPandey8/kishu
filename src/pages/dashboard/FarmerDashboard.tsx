@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { QuickScanCard } from '@/components/home/QuickScanCard';
 import { WeatherWidget } from '@/components/home/WeatherWidget';
-import { RecentDiagnoses } from '@/components/home/RecentDiagnoses';
+
 import { MarketPrices } from '@/components/home/MarketPrices';
 
 import { ExpertHelp } from '@/components/home/ExpertHelp';
