@@ -1,19 +1,21 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Wrench, Calendar, IndianRupee, Star, CheckCircle, XCircle, Clock, Package, ChevronRight } from 'lucide-react';
+import { Wrench, Calendar, IndianRupee, Star, CheckCircle, XCircle, Clock, Package, ChevronRight, BarChart3 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useData } from '@/contexts/DataContext';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { EarningsChart } from '@/components/provider/EarningsChart';
+import { BookingCalendar } from '@/components/provider/BookingCalendar';
+import { PerformanceMetrics } from '@/components/provider/PerformanceMetrics';
 
 const ProviderDashboard = () => {
   const { user } = useAuth();
   const { serviceBookings, agriServices, updateBookingStatus } = useData();
-  const [tab, setTab] = useState<'bookings' | 'services'>('bookings');
+  const [tab, setTab] = useState<'overview' | 'bookings' | 'services'>('overview');
 
-  // Filter bookings for this provider (demo: show all for sp1-sp4)
   const myBookings = serviceBookings.filter(b => b.providerId === 'sp1' || b.providerId === 'sp2' || b.providerId === 'sp3' || b.providerId === 'sp4');
   const myServices = agriServices.filter(s => s.providerId === 'sp1' || s.providerId === 'sp2' || s.providerId === 'sp3' || s.providerId === 'sp4');
 
@@ -70,7 +72,10 @@ const ProviderDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          <Button variant={tab === 'overview' ? 'default' : 'outline'} size="sm" className="rounded-full text-xs" onClick={() => setTab('overview')}>
+            <BarChart3 className="h-3.5 w-3.5 mr-1" /> Overview
+          </Button>
           <Button variant={tab === 'bookings' ? 'default' : 'outline'} size="sm" className="rounded-full text-xs" onClick={() => setTab('bookings')}>
             <Calendar className="h-3.5 w-3.5 mr-1" /> Bookings ({myBookings.length})
           </Button>
@@ -78,6 +83,15 @@ const ProviderDashboard = () => {
             <Package className="h-3.5 w-3.5 mr-1" /> My Services ({myServices.length})
           </Button>
         </div>
+
+        {/* Overview Tab */}
+        {tab === 'overview' && (
+          <div className="space-y-4">
+            <EarningsChart totalRevenue={totalRevenue} />
+            <BookingCalendar bookings={myBookings} />
+            <PerformanceMetrics completedCount={completedBookings.length} totalCount={myBookings.length} avgRating={avgRating} />
+          </div>
+        )}
 
         {/* Bookings Tab */}
         {tab === 'bookings' && (
