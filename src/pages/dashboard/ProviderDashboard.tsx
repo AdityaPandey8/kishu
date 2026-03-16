@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Wrench, Calendar, IndianRupee, Star, CheckCircle, XCircle, Clock, Package, ChevronRight, BarChart3 } from 'lucide-react';
+import { Wrench, Calendar, IndianRupee, Star, CheckCircle, XCircle, Clock, Package, BarChart3 } from 'lucide-react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
