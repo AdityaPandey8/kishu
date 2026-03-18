@@ -1,20 +1,13 @@
 
 
-# Allow Any Credentials for Admin Login (Dev Mode)
+# Show Login Page Instead of Farmer Dashboard for Guests
 
 ## Change
+In `src/pages/Index.tsx`, when no user is logged in, redirect to `/auth` instead of showing `FarmerDashboard`.
 
-**File: `src/pages/auth/AdminLogin.tsx`**
+## Edit
+**File: `src/pages/Index.tsx`** (line 22)
+- Replace `return <FarmerDashboard />;` with `return <Navigate to="/auth" replace />;`
 
-Modify `handleSubmit` to skip credential validation and always log in as admin. Instead of checking if the result user's role is admin, force the role to admin regardless of email.
-
-**File: `src/contexts/AuthContext.tsx`**
-
-In the `login` function, no changes needed — the AdminLogin page will simply not check the role anymore and will force-set the role to admin after login.
-
-Specifically in `AdminLogin.tsx`:
-- Remove the role check (`if (result.user?.role !== 'admin')`) 
-- After login, call `updateUser({ role: 'admin' })` to ensure the logged-in user gets admin access regardless of email
-
-This is a ~5 line edit in one file.
+This ensures unauthenticated users always see the role-selection auth landing page first.
 

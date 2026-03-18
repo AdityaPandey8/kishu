@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 const AdminLogin = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, updateUser } = useAuth();
   const isHindi = i18n.language === 'hi';
   
   const [email, setEmail] = useState('');
@@ -31,11 +31,8 @@ const AdminLogin = () => {
     
     setIsLoading(true);
     try {
-      const result = await login(email, password);
-      if (result.user?.role !== 'admin') {
-        toast.error(isHindi ? 'यह एडमिन खाता नहीं है' : 'This is not an admin account');
-        return;
-      }
+      await login(email, password);
+      updateUser({ role: 'admin' });
       toast.success(t('auth.loginSuccess'));
       navigate('/');
     } catch (error) {
