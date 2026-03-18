@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 const AdminLogin = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, updateUser } = useAuth();
   const isHindi = i18n.language === 'hi';
   
   const [email, setEmail] = useState('');
