@@ -31,11 +31,8 @@ const AdminLogin = () => {
     
     setIsLoading(true);
     try {
-      const result = await login(email, password);
-      if (result.user?.role !== 'admin') {
-        toast.error(isHindi ? 'यह एडमिन खाता नहीं है' : 'This is not an admin account');
-        return;
-      }
+      await login(email, password);
+      updateUser({ role: 'admin' });
       toast.success(t('auth.loginSuccess'));
       navigate('/');
     } catch (error) {
