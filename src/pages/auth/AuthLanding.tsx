@@ -110,7 +110,7 @@ const AuthLanding = () => {
                 viewport={{ once: true }}
                 transition={{ type: 'spring', stiffness: 100, damping: 18, delay: 0.1 + index * 0.1 }}
                 whileHover={{ scale: 1.03, y: -6, rotateX: 3, rotateY: -2 }}
-                className={`${role.bgColor} ${role.borderColor} border-2 rounded-2xl p-5 backdrop-blur-sm`}
+                className={`${role.bgColor} ${role.borderColor} border-2 rounded-2xl p-5 backdrop-blur-sm shadow-sm hover:shadow-premium transition-shadow duration-300`}
                 style={{ transformPerspective: 1000 }}
               >
                 <div className="flex items-start gap-4">
